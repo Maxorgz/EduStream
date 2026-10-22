@@ -1,15 +1,28 @@
+using Microsoft.EntityFrameworkCore;
+using EduStream.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 1. Agregar servicios al contenedor (ANTES del Build)
 builder.Services.AddControllersWithViews();
 
+// Opción A: Si instalaste Pomelo para conectar a MySQL en DBeaver
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<EduStreamDbContext>(options =>
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+// Opción B: Si usas SQL Server, comenta las dos líneas de arriba y descomenta la de abajo
+// builder.Services.AddDbContext<EduStreamDbContext>(options =>
+//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+// 2. Construir 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 3. Configurar el pipeline HTTP
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -24,6 +37,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();
