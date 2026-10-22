@@ -8,10 +8,10 @@ namespace EduStream.Models
         public int Id { get; set; }
 
         [Required(ErrorMessage = "El nombre de la categoria es obligatoria")]
-        [StringLength(100)]
-        public string Nombre { get; set; }
+        [StringLength(100, ErrorMessage = "El nombre no puede superar los 100 caracteres.")]
+        public string Nombre { get; set; } = string.Empty;
 
-        [StringLength(255)]
+        [StringLength(255, ErrorMessage = "La descripción no puede superar los 255 caracteres.")]
         public string? Descripcion { get; set; }
 
         public bool Estado { get; set; } = true; // true = Activa, false = Inactiva
