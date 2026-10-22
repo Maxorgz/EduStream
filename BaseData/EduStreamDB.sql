@@ -51,20 +51,11 @@ CREATE TABLE Inscripciones (
     EstudianteId INT NOT NULL,
     CursoId INT NOT NULL,
     FechaInscripcion DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Estado VARCHAR(50) DEFAULT 'Activa', 
+    Estado VARCHAR(50) DEFAULT 'Activa',
+    MontoPago DECIMAL(10, 2) NOT NULL,
+    EstadoPago VARCHAR(50) DEFAULT 'Pendiente',
     FOREIGN KEY (EstudianteId) REFERENCES Usuarios(Id),
     FOREIGN KEY (CursoId) REFERENCES Cursos(Id)
-);
-
-CREATE TABLE Pagos (
-    Id INT PRIMARY KEY AUTO_INCREMENT,
-    InscripcionId INT NOT NULL,
-    Monto DECIMAL(10, 2) NOT NULL,
-    FechaPago DATETIME DEFAULT CURRENT_TIMESTAMP,
-    MetodoPago VARCHAR(50) NOT NULL,
-    Estado VARCHAR(50) DEFAULT 'Completado', 
-    ComprobanteUrl VARCHAR(255) NULL, 
-    FOREIGN KEY (InscripcionId) REFERENCES Inscripciones(Id)
 );
 
 CREATE TABLE Lecciones (
