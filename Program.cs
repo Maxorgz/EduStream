@@ -16,6 +16,7 @@ builder.Services.AddDbContext<EduStreamDbContext>(options =>
 
 builder.Services.AddScoped<IRepositorioInscripcion, RepositorioInscripcion>();
 builder.Services.AddScoped<IRepositorioProgresoLeccion, RepositorioProgresoLeccion>();
+builder.Services.AddScoped<ICursoRepositorio, RepositorioCurso>();
 
 
 
