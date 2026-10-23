@@ -4,27 +4,25 @@ using EduStream.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Agregar servicios al contenedor (ANTES del Build)
+// Agregar servicios 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 
-// Opción A: Si instalaste Pomelo para conectar a MySQL en DBeaver
+// Conectar a MySQL en DBeaver
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<EduStreamDbContext>(options =>
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
-// Opción B: Si usas SQL Server, comenta las dos líneas de arriba y descomenta la de abajo
-// builder.Services.AddDbContext<EduStreamDbContext>(options =>
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IRepositorioInscripcion, RepositorioInscripcion>();
 builder.Services.AddScoped<IRepositorioProgresoLeccion, RepositorioProgresoLeccion>();
 
 
 
-// 2. Construir 
+// Construir 
 var app = builder.Build();
 
-// 3. Configurar el pipeline HTTP
+// pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
