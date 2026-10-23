@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using EduStream.Data;
+using EduStream.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,10 @@ builder.Services.AddDbContext<EduStreamDbContext>(options =>
 // Opción B: Si usas SQL Server, comenta las dos líneas de arriba y descomenta la de abajo
 // builder.Services.AddDbContext<EduStreamDbContext>(options =>
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IRepositorioInscripcion, RepositorioInscripcion>();
+builder.Services.AddScoped<IRepositorioProgresoLeccion, RepositorioProgresoLeccion>();
+
 
 
 // 2. Construir 

@@ -16,7 +16,6 @@ namespace EduStream.Data
         public DbSet<Inscripcion> Inscripciones { get; set; }
         public DbSet<Leccion> Lecciones { get; set; }
         public DbSet<MaterialEstudio> MaterialesEstudio { get; set; }
-        public DbSet<Pago> Pagos { get; set; }
         public DbSet<ProgresoLeccion> ProgresosLecciones { get; set; }
 
         // Configuraciones adicionales usando Fluent API si fueran necesarias
