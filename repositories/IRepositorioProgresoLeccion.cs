@@ -6,6 +6,7 @@ namespace EduStream.Repositories
     {
         Task<IEnumerable<ProgresoLeccion>> ObtenerPorInscripcionIdAsync(int inscripcionId);
         Task<ProgresoLeccion?> ObtenerPorInscripcionYLeccionAsync(int inscripcionId, int leccionId);
-        Task<bool> RegistrarOActualizarProgresoAsync(ProgresoLeccion progreso);
+        Task<bool> GuardarOActualizarProgresoAsync(int inscripcionId, int leccionId, bool completada);
+        Task<int> ObtenerTotalLeccionesCompletadasAsync(int inscripcionId);
     }
 }

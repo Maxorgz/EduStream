@@ -20,6 +20,7 @@ builder.Services.AddScoped<ICursoRepositorio, RepositorioCurso>();
 builder.Services.AddScoped<ICategoriaRepositorio, RepositorioCategoria>();
 builder.Services.AddScoped<ILeccionRepositorio, RepositorioLeccion>();
 builder.Services.AddScoped<IMaterialEstudioRepositorio, RepositorioMaterialEstudio>();
+builder.Services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
 
 
 
