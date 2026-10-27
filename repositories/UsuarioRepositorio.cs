@@ -35,7 +35,7 @@ namespace EduStream.Repositories
                 return usuario;
             }
 
-            return null; 
+            return null;
         }
 
         public async Task<bool> ExisteEmailAsync(string email)
@@ -54,5 +54,18 @@ namespace EduStream.Repositories
             _context.Usuarios.Update(usuario);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Usuario>> BuscarPorRolYNombreAsync(string rol, string termino)
+        {
+            var query = _context.Usuarios.Where(u => u.Rol == rol).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(termino))
+            {
+                query = query.Where(u => u.Nombre.Contains(termino) || u.Apellido.Contains(termino));
+            }
+
+            return await query.Take(20).ToListAsync();
+        }
+
     }
 }

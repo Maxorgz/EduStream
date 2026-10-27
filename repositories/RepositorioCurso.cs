@@ -18,6 +18,37 @@ namespace EduStream.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Curso>> ObtenerPaginadoAsync(string? buscar, int pagina, int cantidadPorPagina)
+        {
+            var query = _context.Cursos
+                .Include(c => c.Categoria)
+                .Include(c => c.Profesor)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                query = query.Where(c => c.Titulo.Contains(buscar) || c.Descripcion.Contains(buscar));
+            }
+
+            return await query
+                .OrderByDescending(c => c.Id)
+                .Skip((pagina - 1) * cantidadPorPagina)
+                .Take(cantidadPorPagina)
+                .ToListAsync();
+        }
+
+        public async Task<int> ContarTotalAsync(string? buscar)
+        {
+            var query = _context.Cursos.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(buscar))
+            {
+                query = query.Where(c => c.Titulo.Contains(buscar) || c.Descripcion.Contains(buscar));
+            }
+
+            return await query.CountAsync();
+        }
+
         public async Task<Curso?> ObtenerPorIdAsync(int id)
         {
             return await _context.Cursos
@@ -28,12 +59,12 @@ namespace EduStream.Repositories
 
         public async Task<Curso?> ObtenerCursoConDetallesAsync(int id)
         {
-    return await _context.Cursos
-        .Include(c => c.Categoria)
-        .Include(c => c.Profesor)
-        .Include(c => (c.Lecciones ?? new List<Leccion>()).OrderBy(l => l.Orden))
-            .ThenInclude(l => l.Materiales)
-        .FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.Cursos
+                .Include(c => c.Categoria)
+                .Include(c => c.Profesor)
+                .Include(c => (c.Lecciones ?? new List<Leccion>()).OrderBy(l => l.Orden))
+                    .ThenInclude(l => l.Materiales)
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<IEnumerable<Curso>> ObtenerPorCategoriaIdAsync(int categoriaId)

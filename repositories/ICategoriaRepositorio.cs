@@ -6,7 +6,7 @@ namespace EduStream.Repositories
     {
         Task<IEnumerable<Categoria>> ObtenerTodasAsync();
         Task<Categoria?> ObtenerPorIdAsync(int id);
-        Task<Categoria?> ObtenerConCursosAsync(int id); // Útil para ver los cursos que pertenecen a una categoría
+        Task<Categoria?> ObtenerConCursosAsync(int id);
         Task<Categoria> CrearAsync(Categoria categoria);
         Task<bool> ActualizarAsync(Categoria categoria);
         Task<bool> EliminarAsync(int id);

@@ -7,6 +7,8 @@ namespace EduStream.Repositories
         Task<IEnumerable<Curso>> ObtenerTodosAsync();
         Task<Curso?> ObtenerPorIdAsync(int id);
         Task<Curso?> ObtenerCursoConDetallesAsync(int id); // Incluye lecciones y materiales
+        Task<IEnumerable<Curso>> ObtenerPaginadoAsync(string? buscar, int pagina, int cantidadPorPagina);
+        Task<int> ContarTotalAsync(string? buscar);
         Task<IEnumerable<Curso>> ObtenerPorCategoriaIdAsync(int categoriaId);
         Task<IEnumerable<Curso>> ObtenerPorProfesorIdAsync(int profesorId);
         Task<Curso> CrearAsync(Curso curso);
