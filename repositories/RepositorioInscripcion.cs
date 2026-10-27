@@ -50,6 +50,22 @@ namespace EduStream.Repositories
             return inscripcion;
         }
 
+public async Task<IEnumerable<Inscripcion>> ObtenerPaginadoAsync(int pagina, int cantidadPorPagina)
+        {
+            return await _context.Inscripciones
+                .Include(i => i.Estudiante)
+                .Include(i => i.Curso)
+                .OrderByDescending(i => i.FechaInscripcion) // Orden de reciente a la antigua
+                .Skip((pagina - 1) * cantidadPorPagina)
+                .Take(cantidadPorPagina)
+                .ToListAsync();
+        }
+
+        public async Task<int> ContarTotalAsync()
+        {
+            return await _context.Inscripciones.CountAsync();
+        }
+
         public async Task<bool> ActualizarAsync(Inscripcion inscripcion)
         {
             _context.Inscripciones.Update(inscripcion);

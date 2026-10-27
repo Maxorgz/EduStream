@@ -8,6 +8,8 @@ namespace EduStream.Repositories
         Task<Inscripcion?> ObtenerPorIdAsync(int id);
         Task<IEnumerable<Inscripcion>> ObtenerPorEstudianteIdAsync(int estudianteId);
         Task<IEnumerable<Inscripcion>> ObtenerPorCursoIdAsync(int cursoId);
+        Task<IEnumerable<Inscripcion>> ObtenerPaginadoAsync(int pagina, int cantidadPorPagina);
+        Task<int> ContarTotalAsync();
         Task<Inscripcion> CrearAsync(Inscripcion inscripcion);
         Task<bool> ActualizarAsync(Inscripcion inscripcion);
         Task<bool> EliminarAsync(int id);

@@ -1,9 +1,12 @@
 using EduStream.Models;
 using EduStream.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EduStream.Controllers
 {
+    [Authorize]
     public class InscripcionController : Controller
     {
         private readonly IRepositorioInscripcion _inscripcionRepo;
@@ -15,14 +18,25 @@ namespace EduStream.Controllers
             _cursoRepo = cursoRepo;
         }
 
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Index(int pagina = 1)
         {
-            var inscripciones = await _inscripcionRepo.ObtenerTodasAsync();
+            int cantidadPorPagina = 10;
+            var inscripciones = await _inscripcionRepo.ObtenerPaginadoAsync(pagina, cantidadPorPagina);
+            var totalRegistros = await _inscripcionRepo.ContarTotalAsync();
+            
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / cantidadPorPagina);
+
             return View(inscripciones);
         }
 
-        public async Task<IActionResult> MisInscripciones(int estudianteId)
+        [Authorize(Roles = "Estudiante")]
+        public async Task<IActionResult> MisInscripciones()
         {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int estudianteId)) return Unauthorized();
+
             var misInscripciones = await _inscripcionRepo.ObtenerPorEstudianteIdAsync(estudianteId);
             return View(misInscripciones);
         }
@@ -37,8 +51,12 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Inscribir(int estudianteId, int cursoId)
+        [Authorize(Roles = "Estudiante")]
+        public async Task<IActionResult> Inscribir(int cursoId)
         {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdStr, out int estudianteId)) return Unauthorized();
+
             bool yaExiste = await _inscripcionRepo.ExisteInscripcionAsync(estudianteId, cursoId);
             if (yaExiste)
             {
@@ -56,17 +74,18 @@ namespace EduStream.Controllers
                 FechaInscripcion = DateTime.Now,
                 Estado = "Activa",
                 MontoPago = curso.Precio,
-                EstadoPago = "Aprobado" 
+                EstadoPago = "Aprobado" // O Pendiente
             };
 
             await _inscripcionRepo.CrearAsync(nuevaInscripcion);
             TempData["Exito"] = "Inscripción realizada con éxito.";
 
-            return RedirectToAction("MisInscripciones", new { estudianteId });
+            return RedirectToAction("MisInscripciones");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> CambiarEstadoPago(int id, string nuevoEstadoPago)
         {
             var inscripcion = await _inscripcionRepo.ObtenerPorIdAsync(id);
@@ -80,6 +99,7 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<IActionResult> Anular(int id)
         {
             var inscripcion = await _inscripcionRepo.ObtenerPorIdAsync(id);
