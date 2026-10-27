@@ -14,6 +14,11 @@ namespace EduStream.Repositories
             _context = context;
         }
 
+        public async Task<IEnumerable<Usuario>> ObtenerTodosAsync()
+        {
+            return await _context.Usuarios.ToListAsync();
+        }
+
         public async Task<Usuario?> ObtenerPorIdAsync(int id)
         {
             return await _context.Usuarios.FindAsync(id);
@@ -26,10 +31,8 @@ namespace EduStream.Repositories
 
         public async Task<Usuario?> ObtenerPorCredencialesAsync(string email, string password)
         {
-            // Buscamos al usuario solo por el email
             var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
 
-            // verificamos que la contraseña plana coincida con el Hash guardado
             if (usuario != null && BCrypt.Net.BCrypt.Verify(password, usuario.PasswordHash))
             {
                 return usuario;
@@ -67,5 +70,43 @@ namespace EduStream.Repositories
             return await query.Take(20).ToListAsync();
         }
 
+        // metodos para paginado del controlador
+
+        public async Task<IEnumerable<Usuario>> ObtenerPaginadoAsync(string? searchTerm, int pagina, int cantidadPorPagina)
+        {
+            var query = _context.Usuarios.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(u => u.Nombre.Contains(searchTerm) || 
+                                         u.Apellido.Contains(searchTerm) || 
+                                         u.Email.Contains(searchTerm));
+            }
+
+            return await query
+                .Skip((pagina - 1) * cantidadPorPagina)
+                .Take(cantidadPorPagina)
+                .ToListAsync();
+        }
+
+        public async Task<int> ContarTotalAsync(string? searchTerm)
+        {
+            var query = _context.Usuarios.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(u => u.Nombre.Contains(searchTerm) || 
+                                         u.Apellido.Contains(searchTerm) || 
+                                         u.Email.Contains(searchTerm));
+            }
+
+            return await query.CountAsync();
+        }
+
+        public async Task<Usuario> CrearAsync(Usuario usuario)
+        {
+            await AgregarAsync(usuario);
+            return usuario;
+        }
     }
 }
