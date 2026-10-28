@@ -17,7 +17,6 @@ namespace EduStream.Models
         [StringLength(300, ErrorMessage = "La descripcion no puede superar los 300 caracteres.")]
         public string? Descripcion { get; set; }
 
-        [Required(ErrorMessage = "La URL o ruta del archivo es obligatoria.")]
         public string? ArchivoUrl { get; set; } 
         [NotMapped]
         [Required(ErrorMessage = "Debe adjuntar un archivo.")]
