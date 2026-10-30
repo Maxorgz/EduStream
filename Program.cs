@@ -55,6 +55,23 @@ builder.Services.AddAuthentication(options =>
 // Construir 
 var app = builder.Build();
 
+// --- EJECUTAR SEED ---
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<EduStream.Data.EduStreamDbContext>();
+        EduStream.Data.DbInitializer.Initialize(context);
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrio un error al inicializar la base de datos.");
+    }
+}
+// ------------------------------------
+
 // pipeline
 if (!app.Environment.IsDevelopment())
 {

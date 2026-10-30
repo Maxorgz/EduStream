@@ -17,10 +17,12 @@ CREATE TABLE Usuarios (
     Id INT PRIMARY KEY AUTO_INCREMENT,
     Nombre VARCHAR(100) NOT NULL,
     Apellido VARCHAR(100) NOT NULL,
+    Dni VARCHAR(20) NULL,            
     Email VARCHAR(150) UNIQUE NOT NULL,
     PasswordHash VARCHAR(255) NOT NULL,
     Rol VARCHAR(50) NOT NULL, 
     AvatarUrl VARCHAR(255) NULL,
+    Activo BOOLEAN DEFAULT 1,        
     FechaRegistro DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -68,10 +70,11 @@ CREATE TABLE Lecciones (
 
 CREATE TABLE MaterialesEstudio (
     Id INT PRIMARY KEY AUTO_INCREMENT,
-    NombreArchivo VARCHAR(200) NOT NULL,
-    Extension VARCHAR(10) NOT NULL,
-    RutaArchivo VARCHAR(500) NOT NULL,
-    FechaSubida DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Titulo VARCHAR(150) NOT NULL,
+    Descripcion VARCHAR(300) NULL,
+    ArchivoUrl VARCHAR(255) NULL,
+    TipoArchivo VARCHAR(50) NOT NULL,
+    FechaCreacion DATETIME DEFAULT CURRENT_TIMESTAMP,
     LeccionId INT NOT NULL,
     FOREIGN KEY (LeccionId) REFERENCES Lecciones(Id)
 );
@@ -84,4 +87,3 @@ CREATE TABLE ProgresoLecciones (
     FechaUltimoAcceso DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (InscripcionId) REFERENCES Inscripciones(Id),
     FOREIGN KEY (LeccionId) REFERENCES Lecciones(Id)
-);

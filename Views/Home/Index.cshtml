@@ -1,8 +1,129 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mt-4 mb-5">
+    <h1 class="display-4 fw-bold text-primary">Bienvenido a EduStream</h1>
+    <p class="lead text-muted">La plataforma definitiva para tu aprendizaje en línea.</p>
 </div>
+
+@if (!User.Identity!.IsAuthenticated)
+{
+    <!-- VISTA PARA VISITANTES (NO LOGUEADOS) -->
+    <div class="row justify-content-center text-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-body py-5">
+                    <h3 class="mb-4">Comienza tu viaje hoy</h3>
+                    <a asp-controller="Usuario" asp-action="Login" class="btn btn-primary btn-lg me-2">Iniciar Sesión</a>
+                    <a asp-controller="Usuario" asp-action="Register" class="btn btn-outline-success btn-lg">Registrarme</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- VISTA PARA USUARIOS LOGUEADOS -->
+    <div class="row">
+        
+        @if (User.IsInRole("Administrador"))
+        {
+            <!-- PANEL DE ADMINISTRADOR -->
+            <div class="col-12 mb-4">
+                <div class="alert alert-danger shadow-sm border-0 border-start border-danger border-5">
+                    <h4><i class="bi bi-shield-lock"></i> Panel de Administración</h4>
+                    <p class="mb-0">Tienes control total sobre la plataforma.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Usuarios</h5>
+                        <p class="card-text text-muted">Gestiona estudiantes y profesores.</p>
+                        <a asp-controller="Usuario" asp-action="Index" class="btn btn-danger w-100">Gestionar Usuarios</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Categorías (SPA)</h5>
+                        <p class="card-text text-muted">Administra las categorías con Vue.js.</p>
+                        <a asp-controller="Categoria" asp-action="Index" class="btn btn-danger w-100">Gestionar Categorías</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Inscripciones</h5>
+                        <p class="card-text text-muted">Supervisa ventas y accesos.</p>
+                        <a asp-controller="Inscripcion" asp-action="Index" class="btn btn-danger w-100">Ver Inscripciones</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (User.IsInRole("Profesor"))
+        {
+            <!-- PANEL DE PROFESOR -->
+            <div class="col-12 mb-4">
+                <div class="alert alert-success shadow-sm border-0 border-start border-success border-5">
+                    <h4><i class="bi bi-easel"></i> Panel de Profesor</h4>
+                    <p class="mb-0">Gestiona tus cursos y materiales de estudio.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Mis Cursos</h5>
+                        <p class="card-text text-muted">Crea o edita los cursos que dictas.</p>
+                        <a asp-controller="Curso" asp-action="Index" class="btn btn-success w-100">Ir a mis cursos</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Nuevo Curso</h5>
+                        <p class="card-text text-muted">Publica un nuevo curso en la plataforma.</p>
+                        <a asp-controller="Curso" asp-action="Create" class="btn btn-outline-success w-100">+ Crear Curso</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (User.IsInRole("Estudiante"))
+        {
+            <!-- PANEL DE ESTUDIANTE -->
+            <div class="col-12 mb-4">
+                <div class="alert alert-primary shadow-sm border-0 border-start border-primary border-5">
+                    <h4><i class="bi bi-book"></i> Panel de Estudiante</h4>
+                    <p class="mb-0">Continuar leccion donde lo dejaste.</p>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Catálogo</h5>
+                        <p class="card-text text-muted">Explora todos los cursos disponibles.</p>
+                        <a asp-controller="Curso" asp-action="Index" class="btn btn-primary w-100">Ver Catalogo</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Mis Inscripciones</h5>
+                        <p class="card-text text-muted">Accede a tus clases y progreso.</p>
+                        <a asp-controller="Inscripcion" asp-action="MisInscripciones" class="btn btn-outline-primary w-100">Ir a mis clases</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
