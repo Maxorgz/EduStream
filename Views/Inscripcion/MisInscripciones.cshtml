@@ -1,0 +1,75 @@
+@model IEnumerable<EduStream.Models.Inscripcion>
+@{
+    ViewData["Title"] = "Mis Cursos Inscriptos";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2><i class="bi bi-mortarboard"></i> Mis Cursos</h2>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">
+        <i class="bi bi-search"></i> Explorar mas cursos
+    </a>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var inscripcion in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0">
+                    @if (!string.IsNullOrEmpty(inscripcion.Curso?.PortadaUrl))
+                    {
+                        <img src="@inscripcion.Curso.PortadaUrl" class="card-img-top" alt="Portada" style="height: 180px; object-fit: cover;">
+                    }
+                    else
+                    {
+                        <div class="bg-dark text-white d-flex align-items-center justify-content-center card-img-top" style="height: 180px;">
+                            <i class="bi bi-easel fs-1"></i>
+                        </div>
+                    }
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold">@(inscripcion.Curso?.Titulo)</h5>
+                        <p class="text-muted small mb-2">Inscripto el: @inscripcion.FechaInscripcion.ToString("dd/MM/yyyy")</p>
+                        
+                        <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
+                            <span class="badge @(inscripcion.Estado == "Activa" ? "bg-success" : "bg-secondary")">
+                                @inscripcion.Estado
+                            </span>
+                            
+                            @if (inscripcion.Estado == "Activa" && inscripcion.EstadoPago == "Aprobado")
+                            {
+                                <a asp-controller="ProgresoLeccion" asp-action="VerProgreso" asp-route-inscripcionId="@inscripcion.Id" class="btn btn-primary btn-sm fw-bold">
+                                    <i class="bi bi-play-circle"></i> Ir a Clases
+                                </a>
+                            }
+                            else if (inscripcion.EstadoPago != "Aprobado")
+                            {
+                                <span class="text-warning fw-bold small"><i class="bi bi-hourglass-split"></i> Pago @inscripcion.EstadoPago</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-12">
+            <div class="alert alert-secondary text-center shadow-sm py-5">
+                <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+                <h5 class="fw-bold">Todavia no estas inscripto en ningun curso.</h5>
+                <p>Explora nuestro catálogo y comienza a aprender hoy mismo.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-2">Ver Catálogo</a>
+            </div>
+        </div>
+    }
+</div>

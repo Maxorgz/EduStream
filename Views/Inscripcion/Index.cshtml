@@ -1,0 +1,99 @@
+@model IEnumerable<EduStream.Models.Inscripcion>
+@{
+    ViewData["Title"] = "Gestión de Inscripciones";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+    <h2><i class="bi bi-ui-checks"></i> Gestion de Inscripciones</h2>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">Fecha</th>
+                        <th>Estudiante</th>
+                        <th>Curso</th>
+                        <th>Monto</th>
+                        <th>Estado Pago</th>
+                        <th>Estado General</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr class="align-middle">
+                                <td class="ps-3">@item.FechaInscripcion.ToString("dd/MM/yyyy")</td>
+                                <td class="fw-bold">@(item.Estudiante?.Nombre) @(item.Estudiante?.Apellido)</td>
+                                <td>@(item.Curso?.Titulo)</td>
+                                <td>$@item.MontoPago.ToString("N2")</td>
+                                <td>
+                                    <span class="badge @(item.EstadoPago == "Aprobado" ? "bg-success" : (item.EstadoPago == "Pendiente" ? "bg-warning text-dark" : "bg-danger"))">
+                                        @item.EstadoPago
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(item.Estado == "Activa" ? "bg-primary" : "bg-secondary")">
+                                        @item.Estado
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    @if (item.Estado != "Anulada")
+                                    {
+                                        <!-- Formulario para cambiar estado de pago a Aprobado -->
+                                        <form asp-action="CambiarEstadoPago" method="post" class="d-inline">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="nuevoEstadoPago" value="Aprobado" />
+                                            <button type="submit" class="btn btn-sm btn-success" title="Aprobar Pago">
+                                                <i class="bi bi-check-circle"></i>
+                                            </button>
+                                        </form>
+
+                                        <!-- Formulario para anular inscripción -->
+                                        <form asp-action="Anular" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres anular esta inscripción?');">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Anular">
+                                                <i class="bi bi-x-circle"></i>
+                                            </button>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No hay inscripciones registradas en el sistema.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Paginación básica -->
+@if (ViewBag.TotalPaginas > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pagina="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
