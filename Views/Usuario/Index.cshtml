@@ -1,0 +1,132 @@
+@model IEnumerable<EduStream.Models.Usuario>
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    int paginaActual = ViewBag.PaginaActual ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    string busquedaActual = ViewBag.BusquedaActual as string;
+}
+
+<div class="d-flex justify-content-between align-items-center mt-3 mb-4">
+    <h2><i class="bi bi-people-fill text-danger"></i> Panel de Usuarios</h2>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3">
+        <!-- Buscador -->
+        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+            <div class="col-auto flex-grow-1">
+                <input type="text" name="buscar" value="@busquedaActual" class="form-control" placeholder="Buscar por nombre, apellido o email..." />
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+            </div>
+            @if (!string.IsNullOrEmpty(busquedaActual))
+            {
+                <div class="col-auto">
+                    <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
+                </div>
+            }
+        </form>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0 align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">ID</th>
+                        <th>Nombre Completo</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Fecha de Registro</th>
+                        <th>Estado</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="ps-3 fw-bold text-muted">#@item.Id</td>
+                                <td class="fw-bold">@item.Nombre @item.Apellido</td>
+                                <td>@item.Email</td>
+                                <td>
+                                    <span class="badge @(item.Rol == "Administrador" ? "bg-danger" : item.Rol == "Profesor" ? "bg-success" : "bg-primary")">
+                                        @item.Rol
+                                    </span>
+                                </td>
+                                <td>@item.FechaRegistro.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    @if (item.Activo)
+                                    {
+                                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Activo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary"><i class="bi bi-x-circle"></i> Inactivo</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <!-- Detalles del usuario -->
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Detalles">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    
+                                    <!-- Suspender/habilitar (Cambiar Estado) -->
+                                    @if (item.Rol != "Administrador")
+                                    {
+                                        <a asp-action="CambiarEstado" asp-route-id="@item.Id" class="btn btn-sm @(item.Activo ? "btn-warning" : "btn-success")" 
+                                           onclick="return confirm('¿Seguro que deseas @(item.Activo ? "desactivar" : "activar") la cuenta de @item.Nombre?');"
+                                           title="@(item.Activo ? "Suspender" : "Habilitar")">
+                                            <i class="bi @(item.Activo ? "bi-pause-circle" : "bi-play-circle")"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <!-- Evitamos que un administrador se bloquee solo o a otros admins por error -->
+                                        <button class="btn btn-sm btn-secondary" disabled title="No se puede alterar un Administrador"><i class="bi bi-shield-lock"></i></button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                No se encontraron usuarios.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Controles de Paginacion -->
+    @if (totalPaginas > 1)
+    {
+        <div class="card-footer bg-white py-3 d-flex justify-content-center">
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination mb-0">
+                    <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" asp-route-buscar="@busquedaActual">Anterior</a>
+                    </li>
+                    
+                    @for (int i = 1; i <= totalPaginas; i++)
+                    {
+                        <li class="page-item @(i == paginaActual ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-pagina="@i" asp-route-buscar="@busquedaActual">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" asp-route-buscar="@busquedaActual">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

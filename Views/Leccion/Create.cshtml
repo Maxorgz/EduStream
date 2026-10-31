@@ -1,0 +1,55 @@
+@model EduStream.Models.Leccion
+@{
+    ViewData["Title"] = "Agregar Nueva Leccion";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-journal-plus"></i> Nueva Lección para: @ViewBag.CursoTitulo</h4>
+            </div>
+            <div class="card-body p-4 bg-light">
+                
+                <form asp-action="Create" method="post">
+                    <!-- Campo oculto para mantener la relacion con el Curso -->
+                    <input type="hidden" asp-for="CursoId" />
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label asp-for="Orden" class="form-label fw-bold">N° de Clase</label>
+                            <input asp-for="Orden" class="form-control text-center fs-5" type="number" min="1" required />
+                            <span asp-validation-for="Orden" class="text-danger"></span>
+                            <div class="form-text">Ej: 1, 2, 3...</div>
+                        </div>
+                        <div class="col-md-9 mb-3">
+                            <label asp-for="Titulo" class="form-label fw-bold">Título de la Lección</label>
+                            <input asp-for="Titulo" class="form-control fs-5" placeholder="Ej: Variables y Tipos de Datos" required />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Contenido" class="form-label fw-bold">Contenido o Descripcion</label>
+                        <textarea asp-for="Contenido" class="form-control" rows="5" placeholder="Escribe aquí el desarrollo de la clase, instrucciones o texto de lectura..."></textarea>
+                        <span asp-validation-for="Contenido" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Curso" asp-action="Details" asp-route-id="@Model.CursoId" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Guardar Lección
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

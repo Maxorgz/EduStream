@@ -23,7 +23,7 @@ namespace EduStream.Models
         [ForeignKey("CursoId")]
         public virtual Curso? Curso { get; set; }
 
-        // Navegación
+        // Nav
         public virtual ICollection<MaterialEstudio>? Materiales { get; set; }
         public virtual ICollection<ProgresoLeccion>? Progresos { get; set; }
     }

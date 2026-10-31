@@ -1,0 +1,85 @@
+@model EduStream.Models.Leccion
+@{
+    ViewData["Title"] = "Gestión de Clase: " + Model.Titulo;
+}
+
+<div class="row align-items-center mb-4 mt-3">
+    <div class="col-md-8">
+        <span class="badge bg-primary fs-6 mb-2">Clase @Model.Orden</span>
+        <h2 class="fw-bold mb-0">@Model.Titulo</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a asp-controller="Curso" asp-action="Details" asp-route-id="@Model.CursoId" class="btn btn-secondary shadow-sm">
+            <i class="bi bi-arrow-left"></i> Volver al Curso
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Teoria de la Clase -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm h-100 border-0">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-book text-success"></i> Contenido Teórico</h5>
+            </div>
+            <div class="card-body bg-light">
+                @if (!string.IsNullOrEmpty(Model.Contenido))
+                {
+                    <p class="card-text" style="white-space: pre-line;">@Model.Contenido</p>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">No hay texto teorico para esta clase. Todo el contenido está en los materiales adjuntos.</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Materiales (PDFs, Videos, etc) -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm h-100 border-0 border-start border-4 border-info">
+            <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-paperclip text-info"></i> Archivos Adjuntos</h5>
+                <a asp-controller="MaterialEstudio" asp-action="Crear" asp-route-leccionId="@Model.Id" class="btn btn-sm btn-info text-white fw-bold shadow-sm">
+                    <i class="bi bi-cloud-upload"></i> Subir Material
+                </a>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @if (Model.Materiales != null && Model.Materiales.Any())
+                    {
+                        @foreach (var material in Model.Materiales)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">@material.Titulo</h6>
+                                    <span class="badge bg-secondary">@material.TipoArchivo</span>
+                                    <small class="text-muted ms-2 d-block mt-1">@material.Descripcion</small>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <!-- Descarga -->
+                                    <a asp-controller="MaterialEstudio" asp-action="Descargar" asp-route-id="@material.Id" class="btn btn-sm btn-success" title="Descargar">
+                                        <i class="bi bi-download"></i>
+                                    </a>
+                                    <!-- Borrado -->
+                                    <form asp-controller="MaterialEstudio" asp-action="Eliminar" asp-route-id="@material.Id" method="post" onsubmit="return confirm('¿Eliminar este archivo de forma permanente?');">
+                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <li class="list-group-item text-center py-5 text-muted bg-light">
+                            <i class="bi bi-file-earmark-x fs-1 d-block mb-2"></i>
+                            No has subido ningun archivo a esta clase.
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

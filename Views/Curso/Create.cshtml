@@ -1,0 +1,75 @@
+@model EduStream.Models.Curso
+@{
+    ViewData["Title"] = "Crear Nuevo Curso";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-journal-plus"></i> Publicar Nuevo Curso</h4>
+            </div>
+            <div class="card-body p-4">
+                
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Titulo" class="form-label fw-bold">Título del Curso</label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Ej: Introducción a C#" required />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CategoriaId" class="form-label fw-bold">Categoría</label>
+                            <select asp-for="CategoriaId" class="form-select" asp-items="ViewBag.Categorias" required>
+                                <option value="">Seleccione una...</option>
+                            </select>
+                            <span asp-validation-for="CategoriaId" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label fw-bold">Descripción</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="4" placeholder="Detalla lo que los alumnos aprenderán..." required></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Precio" class="form-label fw-bold">Precio ($)</label>
+                            <input asp-for="Precio" type="number" step="0.01" class="form-control" value="0.00" required />
+                            <span asp-validation-for="Precio" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="CupoMaximo" class="form-label fw-bold">Cupo Máximo</label>
+                            <input asp-for="CupoMaximo" type="number" class="form-control" placeholder="Opcional" />
+                            <span asp-validation-for="CupoMaximo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Estado" class="form-label fw-bold">Estado</label>
+                            <select asp-for="Estado" class="form-select">
+                                <option value="Activo">Activo (Visible)</option>
+                                <option value="Borrador">Borrador (Oculto)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Imagen de Portada</label>
+                        <input type="file" name="PortadaFile" class="form-control" accept="image/*" />
+                        <div class="form-text">Formatos recomendados: JPG, PNG. Tamaño ideal: 1280x720px.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                        <button type="submit" class="btn btn-success">Guardar Curso</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,68 @@
+@model EduStream.Models.MaterialEstudio
+@{
+    ViewData["Title"] = "Subir Material de Estudio";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-cloud-arrow-up"></i> Subir Archivo Adjunto</h4>
+            </div>
+            <div class="card-body p-4 bg-light">
+                
+                <form asp-action="Crear" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="LeccionId" />
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Titulo" class="form-label fw-bold">Título del Material</label>
+                            <input asp-for="Titulo" class="form-control" placeholder="Ej: Diapositivas Clase 1" required />
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="TipoArchivo" class="form-label fw-bold">Tipo</label>
+                            <select asp-for="TipoArchivo" class="form-select" required>
+                                <option value="">Seleccione...</option>
+                                <option value="PDF">Documento PDF</option>
+                                <option value="Word">Word (.docx)</option>
+                                <option value="Excel">Excel (.xlsx)</option>
+                                <option value="Imagen">Imagen</option>
+                                <option value="Video">Video (MP4)</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                            <span asp-validation-for="TipoArchivo" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label fw-bold">Breve Descripción (Opcional)</label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="2" placeholder="De qué trata este archivo..."></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4 p-4 border border-info rounded bg-white text-center shadow-sm">
+                        <i class="bi bi-file-earmark-arrow-up fs-1 text-info mb-2 d-block"></i>
+                        <label class="form-label fw-bold">Seleccionar Archivo</label>
+                        <input type="file" name="archivoFile" class="form-control" required />
+                        <div class="form-text mt-2">Asegurarse de no subir archivos pesados.</div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a asp-controller="Leccion" asp-action="Details" asp-route-id="@Model.LeccionId" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-info text-white fw-bold shadow-sm">
+                            <i class="bi bi-upload"></i> Subir Material
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
