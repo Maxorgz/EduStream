@@ -17,7 +17,7 @@ namespace EduStream.Models
         [StringLength(30, ErrorMessage = "El apellido no puede superar los 30 caracteres.")]
         public string Apellido { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "El DNI es obligatorio.")]
+        //[Required(ErrorMessage = "El DNI es obligatorio.")]
         [StringLength(20, ErrorMessage = "El DNI no puede superar los 20 caracteres.")]
         public string Dni { get; set; } = string.Empty;
 

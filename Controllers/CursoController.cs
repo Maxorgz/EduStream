@@ -2,6 +2,8 @@ using EduStream.Models;
 using EduStream.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace EduStream.Controllers
 {
@@ -11,12 +13,14 @@ namespace EduStream.Controllers
     {
         private readonly ICursoRepositorio _cursoRepo;
         private readonly IUsuarioRepositorio _usuarioRepo; 
+        private readonly ICategoriaRepositorio _categoriaRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public CursoController(ICursoRepositorio cursoRepo, IUsuarioRepositorio usuarioRepo, IWebHostEnvironment webHostEnvironment)
+        public CursoController(ICursoRepositorio cursoRepo, IUsuarioRepositorio usuarioRepo, ICategoriaRepositorio categoriaRepo, IWebHostEnvironment webHostEnvironment)
         {
             _cursoRepo = cursoRepo;
             _usuarioRepo = usuarioRepo;
+            _categoriaRepo = categoriaRepo;
             _webHostEnvironment = webHostEnvironment;
         }
 
@@ -45,8 +49,9 @@ namespace EduStream.Controllers
 
         // SEGURIDAD Y ROLES
         [Authorize(Roles = "Administrador,Profesor")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            await CargarCategoriasViewBagAsync();
             return View();
         }
 
@@ -55,6 +60,14 @@ namespace EduStream.Controllers
         [Authorize(Roles = "Administrador,Profesor")]
         public async Task<IActionResult> Create(Curso curso)
         {
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdStr, out int profesorId))
+            {
+                curso.ProfesorId = profesorId;
+            }
+
+            ModelState.Remove("Profesor");
+
             if (ModelState.IsValid)
             {
                 if (curso.PortadaFile != null)
@@ -74,6 +87,8 @@ namespace EduStream.Controllers
                 await _cursoRepo.CrearAsync(curso);
                 return RedirectToAction(nameof(Index));
             }
+
+            await CargarCategoriasViewBagAsync();
             return View(curso);
         }
 
@@ -82,6 +97,7 @@ namespace EduStream.Controllers
         {
             var curso = await _cursoRepo.ObtenerPorIdAsync(id);
             if (curso == null) return NotFound();
+            await CargarCategoriasViewBagAsync();
             return View(curso);
         }
 
@@ -111,7 +127,15 @@ namespace EduStream.Controllers
                 await _cursoRepo.ActualizarAsync(curso);
                 return RedirectToAction(nameof(Index));
             }
+            await CargarCategoriasViewBagAsync();
             return View(curso);
+        }
+
+        private async Task CargarCategoriasViewBagAsync()
+        {
+            var categorias = await _categoriaRepo.ObtenerTodasAsync();
+            // SelectList(OrigenDeDatos, CampoValor, CampoTexto)
+            ViewBag.Categorias = new SelectList(categorias, "Id", "Nombre");
         }
 
         [HttpPost, ActionName("Delete")]

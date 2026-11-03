@@ -87,3 +87,4 @@ CREATE TABLE ProgresoLecciones (
     FechaUltimoAcceso DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (InscripcionId) REFERENCES Inscripciones(Id),
     FOREIGN KEY (LeccionId) REFERENCES Lecciones(Id)
+);

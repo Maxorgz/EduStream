@@ -1,63 +1,107 @@
-@model IEnumerable<EduStream.Models.Categoria>
 @{
     ViewData["Title"] = "Gestión de Categorías";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4 mt-3">
-    <h2><i class="bi bi-tags"></i> Categorias</h2>
-    <a asp-action="Create" class="btn btn-success fw-bold shadow-sm">
-        <i class="bi bi-plus-circle"></i> Nueva Categoria
-    </a>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Categorías (SPA)</h2>
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCategoria" onclick="limpiarFormulario()">
+            <i class="bi bi-plus-circle"></i> Nueva Categoría
+        </button>
+    </div>
+
+    <table class="table table-striped" id="tablaCategorias">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="bodyCategorias"></tbody>
+    </table>
 </div>
 
-<div class="card shadow-sm border-0">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover table-striped mb-0">
-                <thead class="table-dark">
-                    <tr>
-                        <th class="ps-4">Nombre de la Categoria</th>
-                        <th>Descripción</th>
-                        <th class="text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model != null && Model.Any())
-                    {
-                        @foreach (var item in Model)
-                        {
-                            <tr class="align-middle">
-                                <td class="ps-4 fw-bold text-primary">@item.Nombre</td>
-                                <td class="text-muted">
-                                    @(string.IsNullOrEmpty(item.Descripcion) ? "Sin descripcion" : 
-                                      (item.Descripcion.Length > 80 ? item.Descripcion.Substring(0, 80) + "..." : item.Descripcion))
-                                </td>
-                                <td class="text-center">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Cursos">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar esta categoría? Si tiene cursos asociados podría generar un error.');">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="3" class="text-center py-4 text-muted">
-                                No hay categorías creadas. ¡Agrega la primera!
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+<!-- Modal para Crear/Editar -->
+<div class="modal fade" id="modalCategoria" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalTitulo">Nueva Categoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formCategoria">
+                    <input type="hidden" id="catId" value="0" />
+                    <div class="mb-3">
+                        <label for="catNombre" class="form-label font-weight-bold">Nombre</label>
+                        <input type="text" class="form-control" id="catNombre" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="catDescripcion" class="form-label font-weight-bold">Descripción</label>
+                        <textarea class="form-control" id="catDescripcion" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" onclick="guardarCategoria()">Guardar</button>
+            </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", cargarCategorias);
+
+        async function cargarCategorias() {
+            const res = await fetch('/Categoria/ObtenerTodas');
+            const data = await res.json();
+            let html = '';
+            data.forEach(c => {
+                html += `<tr>
+                    <td>${c.id}</td>
+                    <td>${c.nombre}</td>
+                    <td>${c.descripcion || ''}</td>
+                    <td>
+                        <button class="btn btn-sm btn-danger" onclick="eliminarCategoria(${c.id})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('bodyCategorias').innerHTML = html;
+        }
+
+        async function guardarCategoria() {
+            const categoria = {
+                Nombre: document.getElementById('catNombre').value,
+                Descripcion: document.getElementById('catDescripcion').value
+            };
+
+            const res = await fetch('/Categoria/Crear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(categoria)
+            });
+
+            if (res.ok) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('modalCategoria'));
+                modal.hide();
+                cargarCategorias();
+            }
+        }
+
+        function limpiarFormulario() {
+            document.getElementById('catNombre').value = '';
+            document.getElementById('catDescripcion').value = '';
+        }
+
+        async function eliminarCategoria(id) {
+            if (confirm("¿Desea eliminar la categoría?")) {
+                await fetch(`/Categoria/Eliminar?id=${id}`, { method: 'POST' });
+                cargarCategorias();
+            }
+        }
+    </script>
+}
