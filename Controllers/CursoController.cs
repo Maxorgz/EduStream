@@ -25,7 +25,7 @@ namespace EduStream.Controllers
         }
 
         // paginado en servidor y busqueda
-        [AllowAnonymous] 
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string? buscar, int pagina = 1)
         {
             int cantidadPorPagina = 10;
@@ -45,6 +45,21 @@ namespace EduStream.Controllers
             var curso = await _cursoRepo.ObtenerCursoConDetallesAsync(id);
             if (curso == null) return NotFound();
             return View(curso);
+        }
+        [AllowAnonymous]
+        public async Task<IActionResult> Catalogo(string? buscar)
+        {
+            var cursos = await _cursoRepo.ObtenerTodosAsync();
+            var cursosActivos = cursos.Where(c => c.Estado == "Activo");
+
+            if (!string.IsNullOrEmpty(buscar))
+            {
+                cursosActivos = cursosActivos.Where(c =>
+                    c.Titulo.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
+                    c.Descripcion.Contains(buscar, StringComparison.OrdinalIgnoreCase));
+            }
+
+            return View(cursosActivos);
         }
 
         // SEGURIDAD Y ROLES
@@ -152,8 +167,9 @@ namespace EduStream.Controllers
         public async Task<IActionResult> BuscarProfesoresAjax(string termino)
         {
             var profesores = await _usuarioRepo.BuscarPorRolYNombreAsync("Profesor", termino);
-            
-            var resultados = profesores.Select(p => new {
+
+            var resultados = profesores.Select(p => new
+            {
                 id = p.Id,
                 text = p.Nombre + " " + p.Apellido
             });

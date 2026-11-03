@@ -2,106 +2,165 @@
     ViewData["Title"] = "Gestión de Categorías";
 }
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Categorías (SPA)</h2>
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCategoria" onclick="limpiarFormulario()">
+<div id="app-categorias" v-cloak>
+    <div class="d-flex justify-content-between align-items-center mb-4 mt-3">
+        <h2><i class="bi bi-tags text-primary"></i> Categorías <span class="badge bg-warning text-dark fs-6">Vue.js SPA</span></h2>
+        
+        <button @@click="abrirModal()" class="btn btn-success fw-bold shadow-sm">
             <i class="bi bi-plus-circle"></i> Nueva Categoría
         </button>
     </div>
 
-    <table class="table table-striped" id="tablaCategorias">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="bodyCategorias"></tbody>
-    </table>
-</div>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="ps-4">Nombre de la Categoría</th>
+                            <th>Descripción</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="cat in categorias" :key="cat.id" class="align-middle">
+                            <td class="ps-4 fw-bold text-primary">{{ cat.nombre }}</td>
+                            <td class="text-muted">
+                                {{ cat.descripcion ? (cat.descripcion.length > 80 ? cat.descripcion.substring(0, 80) + '...' : cat.descripcion) : 'Sin descripción' }}
+                            </td>
+                            <td class="text-center">
+                                <span class="badge" :class="cat.estado ? 'bg-success' : 'bg-secondary'">
+                                    {{ cat.estado ? 'Activa' : 'Inactiva' }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <button @@click="abrirModal(cat)" class="btn btn-sm btn-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button @@click="confirmarEliminacion(cat.id)" class="btn btn-sm btn-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="categorias.length === 0">
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                Cargando categorías o no hay datos disponibles.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-<!-- Modal para Crear/Editar -->
-<div class="modal fade" id="modalCategoria" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalTitulo">Nueva Categoría</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form id="formCategoria">
-                    <input type="hidden" id="catId" value="0" />
-                    <div class="mb-3">
-                        <label for="catNombre" class="form-label font-weight-bold">Nombre</label>
-                        <input type="text" class="form-control" id="catNombre" required />
-                    </div>
-                    <div class="mb-3">
-                        <label for="catDescripcion" class="form-label font-weight-bold">Descripción</label>
-                        <textarea class="form-control" id="catDescripcion" rows="3"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="guardarCategoria()">Guardar</button>
+    <!-- Modal Formulario Vue -->
+    <div class="modal fade" id="categoriaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title fw-bold text-primary">
+                        <i class="bi bi-tag-fill me-2"></i>{{ categoriaEditando.id ? 'Editar' : 'Crear' }} Categoría
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @@submit.prevent="guardarCategoria">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Nombre</label>
+                            <input type="text" class="form-control" v-model="categoriaEditando.nombre" required placeholder="Ej: Programación Backend">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Descripción</label>
+                            <textarea class="form-control" v-model="categoriaEditando.descripcion" rows="3" placeholder="Detalle de la categoría..."></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success fw-bold" :disabled="cargando">
+                                <span v-if="cargando" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                {{ cargando ? 'Guardando...' : 'Guardar Cambios' }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", cargarCategorias);
+        const { createApp } = Vue;
 
-        async function cargarCategorias() {
-            const res = await fetch('/Categoria/ObtenerTodas');
-            const data = await res.json();
-            let html = '';
-            data.forEach(c => {
-                html += `<tr>
-                    <td>${c.id}</td>
-                    <td>${c.nombre}</td>
-                    <td>${c.descripcion || ''}</td>
-                    <td>
-                        <button class="btn btn-sm btn-danger" onclick="eliminarCategoria(${c.id})"><i class="bi bi-trash"></i></button>
-                    </td>
-                </tr>`;
-            });
-            document.getElementById('bodyCategorias').innerHTML = html;
-        }
-
-        async function guardarCategoria() {
-            const categoria = {
-                Nombre: document.getElementById('catNombre').value,
-                Descripcion: document.getElementById('catDescripcion').value
-            };
-
-            const res = await fetch('/Categoria/Crear', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(categoria)
-            });
-
-            if (res.ok) {
-                var modal = bootstrap.Modal.getInstance(document.getElementById('modalCategoria'));
-                modal.hide();
-                cargarCategorias();
+        createApp({
+            data() {
+                return {
+                    categorias: [],
+                    categoriaEditando: { id: 0, nombre: '', descripcion: '', estado: true },
+                    modalInstance: null,
+                    cargando: false
+                }
+            },
+            mounted() {
+                this.modalInstance = new bootstrap.Modal(document.getElementById('categoriaModal'));
+                this.cargarCategorias();
+            },
+            methods: {
+                async cargarCategorias() {
+                    try {
+                        const response = await axios.get('/Categoria/ObtenerTodas');
+                        this.categorias = response.data;
+                    } catch (error) {
+                        console.error("Error al cargar categorías:", error);
+                    }
+                },
+                abrirModal(categoria = null) {
+                    if (categoria) {
+                        this.categoriaEditando = { ...categoria };
+                    } else {
+                        this.categoriaEditando = { id: 0, nombre: '', descripcion: '', estado: true };
+                    }
+                    this.modalInstance.show();
+                },
+                async guardarCategoria() {
+                    this.cargando = true;
+                    try {
+                        const esEdicion = this.categoriaEditando.id > 0;
+                        const actionUrl = esEdicion ? '/Categoria/Editar' : '/Categoria/Crear';
+                        
+                        const response = await axios.post(actionUrl, this.categoriaEditando);
+                        
+                        if(response.data.success) {
+                            await this.cargarCategorias(); 
+                            this.modalInstance.hide();
+                        }
+                    } catch (error) {
+                        console.error("Error guardando:", error);
+                        alert("Verifica los datos ingresados.");
+                    } finally {
+                        this.cargando = false;
+                    }
+                },
+                async confirmarEliminacion(id) {
+                    if (confirm('¿Seguro que quieres eliminar esta categoría?')) {
+                        try {
+                            const response = await axios.post(`/Categoria/Eliminar?id=${id}`);
+                            if(response.data.success) {
+                                await this.cargarCategorias();
+                            }
+                        } catch (error) {
+                            console.error("Error eliminando:", error);
+                            alert("Hubo un error al eliminar.");
+                        }
+                    }
+                }
             }
-        }
-
-        function limpiarFormulario() {
-            document.getElementById('catNombre').value = '';
-            document.getElementById('catDescripcion').value = '';
-        }
-
-        async function eliminarCategoria(id) {
-            if (confirm("¿Desea eliminar la categoría?")) {
-                await fetch(`/Categoria/Eliminar?id=${id}`, { method: 'POST' });
-                cargarCategorias();
-            }
-        }
+        }).mount('#app-categorias');
     </script>
+
+    <style>
+        [v-cloak] { display: none; }
+    </style>
 }

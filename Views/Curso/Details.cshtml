@@ -10,105 +10,125 @@
         <p class="text-muted fs-5 mb-0">Categoría: @(Model.Categoria?.Nombre ?? "Sin categoría")</p>
     </div>
     <div class="col-md-4 text-end">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i> Volver a Mis Cursos
-        </a>
+        @if (User.IsInRole("Profesor") || User.IsInRole("Administrador"))
+        {
+            <a asp-action="Index" class="btn btn-secondary shadow-sm">
+                <i class="bi bi-arrow-left"></i> Volver a Mis Cursos
+            </a>
+        }
+        else
+        {
+            <a asp-action="Catalogo" class="btn btn-secondary shadow-sm">
+                <i class="bi bi-arrow-left"></i> Volver al Catalogo
+            </a>
+        }
     </div>
 </div>
 
-<!-- Info del Curso -->
-<div class="card shadow-sm mb-5 border-0">
-    <div class="row g-0">
-        <div class="col-md-4">
+<div class="row">
+    <!-- Info y Temario -->
+    <div class="col-lg-8 mb-4">
+        <!-- Info -->
+        <div class="card shadow-sm mb-4 border-0">
             @if (!string.IsNullOrEmpty(Model.PortadaUrl))
             {
-                <img src="@Model.PortadaUrl" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover; min-height: 200px;" alt="Portada del curso">
+                <img src="@Model.PortadaUrl" class="card-img-top" style="max-height: 350px; object-fit: cover;" alt="Portada del curso">
             }
-            else
-            {
-                <div class="bg-dark text-white d-flex align-items-center justify-content-center h-100 rounded-start" style="min-height: 200px;">
-                    <div class="text-center">
-                        <i class="bi bi-image text-secondary" style="font-size: 3rem;"></i>
-                        <p class="mb-0 mt-2">Sin portada</p>
-                    </div>
-                </div>
-            }
-        </div>
-        <div class="col-md-8">
-            <div class="card-body d-flex flex-column h-100">
-                <h5 class="card-title fw-bold border-bottom pb-2">Descripcion General</h5>
-                <p class="card-text flex-grow-1">@Model.Descripcion</p>
-                
-                <div class="row text-center mt-3 pt-3 border-top bg-light rounded py-2 mx-1">
-                    <div class="col-4">
-                        <span class="text-muted d-block" style="font-size: 0.85rem;">PRECIO</span>
-                        <strong class="fs-5">$@Model.Precio.ToString("N2")</strong>
-                    </div>
-                    <div class="col-4 border-start border-end">
-                        <span class="text-muted d-block" style="font-size: 0.85rem;">CUPO</span>
-                        <strong class="fs-5">@(Model.CupoMaximo.HasValue ? Model.CupoMaximo.Value.ToString() : "Ilimitado")</strong>
-                    </div>
-                    <div class="col-4">
-                        <span class="text-muted d-block" style="font-size: 0.85rem;">ESTADO</span>
-                        <span class="badge @(Model.Estado == "Activo" ? "bg-success" : "bg-warning") fs-6 mt-1">@Model.Estado</span>
-                    </div>
-                </div>
+            <div class="card-body p-4">
+                <h4 class="card-title fw-bold border-bottom pb-2">Acerca de este curso</h4>
+                <p class="card-text fs-5" style="white-space: pre-line;">@Model.Descripcion</p>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Sección del Plan de Estudios (Lecciones) -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="fw-bold"><i class="bi bi-list-ol text-primary"></i> Plan de Estudios</h3>
-    
-    <!-- Este boton llama al Create de la LeccionController, pasandole el ID de este curso -->
-    <a asp-controller="Leccion" asp-action="Create" asp-route-cursoId="@Model.Id" class="btn btn-primary shadow-sm">
-        <i class="bi bi-plus-circle"></i> Agregar Lección
-    </a>
-</div>
+        <!-- Plan de Estudios -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold"><i class="bi bi-list-ol text-primary"></i> Temario del Curso</h4>
+            
+            @if (User.IsInRole("Profesor"))
+            {
+                <a asp-controller="Leccion" asp-action="Create" asp-route-cursoId="@Model.Id" class="btn btn-primary btn-sm shadow-sm">
+                    <i class="bi bi-plus-circle"></i> Agregar Lección
+                </a>
+            }
+        </div>
 
-@if (Model.Lecciones != null && Model.Lecciones.Any())
-{
-    <div class="accordion shadow-sm" id="accordionLecciones">
-        @foreach (var leccion in Model.Lecciones.OrderBy(l => l.Orden))
+        @if (Model.Lecciones != null && Model.Lecciones.Any())
         {
-            <div class="accordion-item">
-                <h2 class="accordion-header" id="heading-@leccion.Id">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@leccion.Id" aria-expanded="false" aria-controls="collapse-@leccion.Id">
-                        <span class="badge bg-primary me-3">Clase @leccion.Orden</span>
-                        <span class="fw-bold">@leccion.Titulo</span>
-                    </button>
-                </h2>
-                <div id="collapse-@leccion.Id" class="accordion-collapse collapse" aria-labelledby="heading-@leccion.Id" data-bs-parent="#accordionLecciones">
-                    <div class="accordion-body bg-light">
-                        <p>@(string.IsNullOrEmpty(leccion.Contenido) ? "Sin descripción detallada." : leccion.Contenido)</p>
-                        
-                        <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
-                            <!-- Botón para ir al LeccionController -> Details (donde se suben los Materiales PDF/Video) -->
-                            <a asp-controller="Leccion" asp-action="Details" asp-route-id="@leccion.Id" class="btn btn-sm btn-info text-white">
-                                <i class="bi bi-paperclip"></i> Materiales
-                            </a>
-                            <a asp-controller="Leccion" asp-action="Edit" asp-route-id="@leccion.Id" class="btn btn-sm btn-warning">
-                                <i class="bi bi-pencil"></i> Editar
-                            </a>
-                            <form asp-controller="Leccion" asp-action="Delete" asp-route-id="@leccion.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro de querer eliminar la leccion @leccion.Orden? Tambien se borraran sus materiales.');">
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    <i class="bi bi-trash"></i> Eliminar
-                                </button>
-                            </form>
+            <div class="accordion shadow-sm" id="accordionLecciones">
+                @foreach (var leccion in Model.Lecciones.OrderBy(l => l.Orden))
+                {
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-@leccion.Id">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@leccion.Id">
+                                <span class="badge bg-primary me-3">Clase @leccion.Orden</span>
+                                <span class="fw-bold">@leccion.Titulo</span>
+                            </button>
+                        </h2>
+                        <div id="collapse-@leccion.Id" class="accordion-collapse collapse" data-bs-parent="#accordionLecciones">
+                            <div class="accordion-body bg-light">
+                                <p class="text-muted mb-0">@(string.IsNullOrEmpty(leccion.Contenido) ? "Detalles de la clase." : leccion.Contenido)</p>
+                                
+                                <!--edicion Profesor -->
+                                @if (User.IsInRole("Profesor"))
+                                {
+                                    <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
+                                        <a asp-controller="Leccion" asp-action="Details" asp-route-id="@leccion.Id" class="btn btn-sm btn-info text-white">
+                                            <i class="bi bi-paperclip"></i> Materiales
+                                        </a>
+                                        <a asp-controller="Leccion" asp-action="Edit" asp-route-id="@leccion.Id" class="btn btn-sm btn-warning">
+                                            <i class="bi bi-pencil"></i> Editar
+                                        </a>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-secondary text-center shadow-sm py-4">
+                El temario aún está en construcción.
             </div>
         }
     </div>
-}
-else
-{
-    <div class="alert alert-secondary text-center shadow-sm py-4">
-        <i class="bi bi-journal-x fs-1 text-muted d-block mb-2"></i>
-        Este curso no tiene clases asignadas.<br />
-        Haz clic en <strong>"Agregar Lección"</strong> para empezar a construir los temas.
+
+    <!-- Tarjeta de Inscripcion-->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+            <div class="card-body p-4 text-center">
+                <h2 class="fw-bold text-success mb-3">$@Model.Precio.ToString("N2")</h2>
+                
+                <ul class="list-unstyled text-start mb-4">
+                    <li class="mb-2"><i class="bi bi-person-video3 text-primary me-2"></i> <strong>Profesor:</strong> @(Model.Profesor?.Nombre ?? "Asignado") @(Model.Profesor?.Apellido ?? "")</li>
+                    <li class="mb-2"><i class="bi bi-journal-text text-primary me-2"></i> <strong>Clases:</strong> @(Model.Lecciones?.Count ?? 0) lecciones</li>
+                    <li class="mb-2"><i class="bi bi-people text-primary me-2"></i> <strong>Cupo:</strong> @(Model.CupoMaximo.HasValue ? Model.CupoMaximo.Value.ToString() : "Ilimitado")</li>
+                </ul>
+
+                <!-- Inscripcion -->
+                @if (User.IsInRole("Estudiante"))
+                {
+                    <form asp-controller="Inscripcion" asp-action="Inscribir" method="post">
+                        <input type="hidden" name="CursoId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm class-hover-zoom">
+                            <i class="bi bi-cart-plus"></i> Inscribirme Ahora
+                        </button>
+                    </form>
+                }
+                else if (!User.Identity!.IsAuthenticated)
+                {
+                    <a asp-controller="Usuario" asp-action="Login" class="btn btn-outline-primary btn-lg w-100 fw-bold shadow-sm">
+                        Inicia Sesión para Inscribirte
+                    </a>
+                }
+                else if (User.IsInRole("Profesor"))
+                {
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> Eres el administrador de este curso.
+                    </div>
+                }
+            </div>
+        </div>
     </div>
-}
+</div>
