@@ -62,7 +62,7 @@ namespace EduStream.Repositories
             return await _context.Cursos
                 .Include(c => c.Categoria)
                 .Include(c => c.Profesor)
-                .Include(c => (c.Lecciones ?? new List<Leccion>()).OrderBy(l => l.Orden))
+                .Include(c => c.Lecciones.OrderBy(l => l.Orden))
                     .ThenInclude(l => l.Materiales)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }

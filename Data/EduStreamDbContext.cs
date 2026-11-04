@@ -26,6 +26,9 @@ namespace EduStream.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
+
+            modelBuilder.Entity<ProgresoLeccion>()
+                .ToTable("progresolecciones");
         }
     }
 }

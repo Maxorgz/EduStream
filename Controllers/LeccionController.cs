@@ -17,17 +17,6 @@ namespace EduStream.Controllers
             _cursoRepo = cursoRepo;
         }
 
-        public async Task<IActionResult> PorCurso(int cursoId)
-        {
-            var curso = await _cursoRepo.ObtenerPorIdAsync(cursoId);
-            if (curso == null) return NotFound();
-
-            var lecciones = await _leccionRepo.ObtenerPorCursoIdAsync(cursoId);
-            ViewBag.Curso = curso;
-
-            return View(lecciones);
-        }
-
         public async Task<IActionResult> Details(int id)
         {
             var leccion = await _leccionRepo.ObtenerLeccionConMaterialesAsync(id);
@@ -36,7 +25,7 @@ namespace EduStream.Controllers
             return View(leccion);
         }
 
-        [Authorize(Roles = "Profesor")]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Create(int cursoId)
         {
             var curso = await _cursoRepo.ObtenerPorIdAsync(cursoId);
@@ -54,14 +43,17 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Profesor")]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Create(Leccion leccion)
         {
+            ModelState.Remove("Curso");
+
             if (ModelState.IsValid)
             {
                 await _leccionRepo.CrearAsync(leccion);
                 TempData["Exito"] = "Lección creada correctamente.";
-                return RedirectToAction(nameof(PorCurso), new { cursoId = leccion.CursoId });
+                
+                return RedirectToAction("Details", "Curso", new { id = leccion.CursoId });
             }
 
             var curso = await _cursoRepo.ObtenerPorIdAsync(leccion.CursoId);
@@ -70,7 +62,7 @@ namespace EduStream.Controllers
             return View(leccion);
         }
 
-        [Authorize(Roles = "Profesor")]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var leccion = await _leccionRepo.ObtenerPorIdAsync(id);
@@ -81,10 +73,12 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Profesor")]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Edit(int id, Leccion leccion)
         {
             if (id != leccion.Id) return BadRequest();
+
+            ModelState.Remove("Curso");
 
             if (ModelState.IsValid)
             {
@@ -92,7 +86,8 @@ namespace EduStream.Controllers
                 if (!exito) return NotFound();
 
                 TempData["Exito"] = "Lección actualizada correctamente.";
-                return RedirectToAction(nameof(PorCurso), new { cursoId = leccion.CursoId });
+                
+                return RedirectToAction(nameof(Details), new { id = leccion.Id });
             }
 
             return View(leccion);
@@ -110,7 +105,8 @@ namespace EduStream.Controllers
             await _leccionRepo.EliminarAsync(id);
 
             TempData["Exito"] = "Lección eliminada correctamente.";
-            return RedirectToAction(nameof(PorCurso), new { cursoId });
+            
+            return RedirectToAction("Details", "Curso", new { id = cursoId });
         }
     }
 }

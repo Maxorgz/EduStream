@@ -25,7 +25,7 @@ namespace EduStream.Controllers
         }
 
         // paginado en servidor y busqueda
-        [AllowAnonymous]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Index(string? buscar, int pagina = 1)
         {
             int cantidadPorPagina = 10;
@@ -107,11 +107,18 @@ namespace EduStream.Controllers
             return View(curso);
         }
 
-        [Authorize(Roles = "Administrador,Profesor")]
+        [Authorize(Roles = "Profesor,Administrador")]
         public async Task<IActionResult> Edit(int id)
         {
             var curso = await _cursoRepo.ObtenerPorIdAsync(id);
             if (curso == null) return NotFound();
+
+            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdStr, out int profesorId) && curso.ProfesorId != profesorId && !User.IsInRole("Administrador"))
+            {
+                return Forbid();
+            }
+
             await CargarCategoriasViewBagAsync();
             return View(curso);
         }
@@ -122,6 +129,8 @@ namespace EduStream.Controllers
         public async Task<IActionResult> Edit(int id, Curso curso)
         {
             if (id != curso.Id) return BadRequest();
+
+            ModelState.Remove("Profesor");
 
             if (ModelState.IsValid)
             {

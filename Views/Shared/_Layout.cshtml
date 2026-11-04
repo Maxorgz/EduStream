@@ -38,34 +38,37 @@
                                     <a class="nav-link text-warning" asp-controller="Usuario" asp-action="Index">Usuarios</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-warning" asp-controller="Categoria" asp-action="Index">Categorías
-                                        (SPA)</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-warning" asp-controller="Inscripcion"
-                                           asp-action="Index">Inscripciones</a>
-                                    </li>
-                                }
+                                    <a class="nav-link text-warning" asp-controller="Categoria" asp-action="Index">Categorías (SPA)</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-warning" asp-controller="Curso" asp-action="Index">Gestión Cursos</a>
+                                </li>
+                            }
 
-                                @if (User.IsInRole("Profesor"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link text-success" asp-controller="Curso" asp-action="Index">Mis Cursos</a>
-                                    </li>
-                                }
+                            @if (User.IsInRole("Profesor"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-success" asp-controller="Curso" asp-action="Index">Mis Cursos</a>
+                                </li>
+                            }
 
-                                @if (User.IsInRole("Estudiante"))
-                                {
-                                    <li class="nav-item">
-                                        <a class="nav-link text-info" asp-controller="Curso" asp-action="Index">Catálogo</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link text-info" asp-controller="Inscripcion" asp-action="MisInscripciones">Mis
-                                            Clases</a>
-                                        </li>
-                                    }
-                                }
-                            </ul>
+                            @if (User.IsInRole("Estudiante"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-info" asp-controller="Curso" asp-action="Catalogo">Catálogo de Cursos</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-info" asp-controller="Inscripcion" asp-action="MisInscripciones">Mis Clases</a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-info" asp-controller="Curso" asp-action="Catalogo">Catálogo</a>
+                            </li>
+                        }
+                    </ul>
 
                     <ul class="navbar-nav">
                         @if (User.Identity.IsAuthenticated)
