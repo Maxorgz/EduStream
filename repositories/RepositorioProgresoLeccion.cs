@@ -14,6 +14,7 @@ namespace EduStream.Repositories
         {
             return await _context.ProgresosLecciones
                 .Include(p => p.Leccion)
+                .ThenInclude(l => l.Materiales)
                 .Where(p => p.InscripcionId == inscripcionId)
                 .ToListAsync();
         }

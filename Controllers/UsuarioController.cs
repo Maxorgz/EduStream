@@ -121,7 +121,7 @@ namespace EduStream.Controllers
             {
                 // aca Hasheamos la contraseña con BCrypt
                 usuario.PasswordHash = BCrypt.Net.BCrypt.HashPassword(usuario.PasswordHash);
-                
+
                 // Forzamos por seguridad los registros publicos de Estudiantes y los activos
                 usuario.Rol = "Estudiante";
                 usuario.Activo = true;
@@ -187,5 +187,87 @@ namespace EduStream.Controllers
 
             return View(usuario);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> ActualizarAvatar(Usuario modeloView)
+        {
+            // Obtenemos el usuario real de la base de datos
+            var usuarioBd = await _usuarioRepo.ObtenerPorIdAsync(modeloView.Id);
+            if (usuarioBd == null) return NotFound();
+
+            if (modeloView.AvatarFile != null && modeloView.AvatarFile.Length > 0)
+            {
+                // 1. Definimos ruta en wwwroot/images/avatars
+                string carpetaDestino = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
+                if (!Directory.Exists(carpetaDestino)) Directory.CreateDirectory(carpetaDestino);
+
+                // 2. Generamos un nombre único para evitar que fotos con el mismo nombre se pisen
+                string nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(modeloView.AvatarFile.FileName);
+                string rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
+
+                // 3. Guardamos el archivo físico
+                using (var stream = new FileStream(rutaCompleta, FileMode.Create))
+                {
+                    await modeloView.AvatarFile.CopyToAsync(stream);
+                }
+
+                // 4. Borramos el avatar anterior si existía
+                if (!string.IsNullOrEmpty(usuarioBd.AvatarUrl))
+                {
+                    string rutaVieja = Path.Combine(_webHostEnvironment.WebRootPath, usuarioBd.AvatarUrl.TrimStart('/'));
+                    if (System.IO.File.Exists(rutaVieja)) System.IO.File.Exists(rutaVieja);
+                }
+
+                // 5. Actualizamos la URL en la base de datos
+                usuarioBd.AvatarUrl = "/images/avatars/" + nombreArchivo;
+                await _usuarioRepo.ActualizarAsync(usuarioBd);
+
+                TempData["Exito"] = "Foto de perfil actualizada correctamente.";
+            }
+
+            return RedirectToAction(nameof(Perfil));
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var usuario = await _usuarioRepo.ObtenerPorIdAsync(id);
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+            return View(usuario);
+        }
+
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Usuario usuarioActualizado)
+        {
+            if (id != usuarioActualizado.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _usuarioRepo.ActualizarAsync(usuarioActualizado);
+                    TempData["Exito"] = $"Usuario {usuarioActualizado.Nombre} actualizado correctamente.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception)
+                {
+                    TempData["Error"] = "Error al actualizar el usuario en la base de datos.";
+                }
+            }
+
+            return View(usuarioActualizado);
+        }
+
     }
 }

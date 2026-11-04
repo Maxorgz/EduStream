@@ -53,7 +53,8 @@
                                 <td class="fw-bold">@item.Nombre @item.Apellido</td>
                                 <td>@item.Email</td>
                                 <td>
-                                    <span class="badge @(item.Rol == "Administrador" ? "bg-danger" : item.Rol == "Profesor" ? "bg-success" : "bg-primary")">
+                                    <span
+                                        class="badge @(item.Rol == "Administrador" ? "bg-danger" : item.Rol == "Profesor" ? "bg-success" : "bg-primary")">
                                         @item.Rol
                                     </span>
                                 </td>
@@ -70,14 +71,22 @@
                                 </td>
                                 <td class="text-center">
                                     <!-- Detalles del usuario -->
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Detalles">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white"
+                                       title="Ver Detalles">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    
+
+                                    <!-- Editar -->
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary"
+                                       title="Editar Usuario">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
                                     <!-- Suspender/habilitar (Cambiar Estado) -->
                                     @if (item.Rol != "Administrador")
                                     {
-                                        <a asp-action="CambiarEstado" asp-route-id="@item.Id" class="btn btn-sm @(item.Activo ? "btn-warning" : "btn-success")" 
+                                        <a asp-action="CambiarEstado" asp-route-id="@item.Id"
+                                           class="btn btn-sm @(item.Activo ? "btn-warning" : "btn-success")"
                                            onclick="return confirm('¿Seguro que deseas @(item.Activo ? "desactivar" : "activar") la cuenta de @item.Nombre?');"
                                            title="@(item.Activo ? "Suspender" : "Habilitar")">
                                             <i class="bi @(item.Activo ? "bi-pause-circle" : "bi-play-circle")"></i>
@@ -86,7 +95,8 @@
                                     else
                                     {
                                         <!-- Evitamos que un administrador se bloquee solo o a otros admins por error -->
-                                        <button class="btn btn-sm btn-secondary" disabled title="No se puede alterar un Administrador"><i class="bi bi-shield-lock"></i></button>
+                                        <button class="btn btn-sm btn-secondary" disabled
+                                                title="No se puede alterar un Administrador"><i class="bi bi-shield-lock"></i></button>
                                     }
                                 </td>
                             </tr>
@@ -112,18 +122,21 @@
             <nav aria-label="Navegación de páginas">
                 <ul class="pagination mb-0">
                     <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)" asp-route-buscar="@busquedaActual">Anterior</a>
+                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual - 1)"
+                           asp-route-buscar="@busquedaActual">Anterior</a>
                     </li>
-                    
+
                     @for (int i = 1; i <= totalPaginas; i++)
                     {
                         <li class="page-item @(i == paginaActual ? "active" : "")">
-                            <a class="page-link" asp-action="Index" asp-route-pagina="@i" asp-route-buscar="@busquedaActual">@i</a>
+                            <a class="page-link" asp-action="Index" asp-route-pagina="@i"
+                               asp-route-buscar="@busquedaActual">@i</a>
                         </li>
                     }
 
                     <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
-                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)" asp-route-buscar="@busquedaActual">Siguiente</a>
+                        <a class="page-link" asp-action="Index" asp-route-pagina="@(paginaActual + 1)"
+                           asp-route-buscar="@busquedaActual">Siguiente</a>
                     </li>
                 </ul>
             </nav>

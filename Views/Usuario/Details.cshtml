@@ -1,0 +1,62 @@
+@model EduStream.Models.Usuario
+@{
+    ViewData["Title"] = "Detalles del Usuario";
+}
+
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0"><i class="bi bi-person-vcard"></i> Ficha del Usuario #@Model.Id</h5>
+                <span class="badge @(Model.Activo ? "bg-success" : "bg-secondary") fs-6">
+                    @(Model.Activo ? "Cuenta Activa" : "Cuenta Suspendida")
+                </span>
+            </div>
+            
+            <div class="card-body p-4 bg-light">
+                <div class="text-center mb-4">
+                    @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                    {
+                        <img src="@Model.AvatarUrl" alt="Avatar" class="rounded-circle shadow-sm border border-3 border-white" style="width: 100px; height: 100px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <i class="bi bi-person-circle text-secondary shadow-sm rounded-circle bg-white px-2" style="font-size: 5rem;"></i>
+                    }
+                    <h4 class="mt-3 fw-bold text-primary">@Model.Nombre @Model.Apellido</h4>
+                    <p class="text-muted mb-0">@Model.Email</p>
+                </div>
+
+                <div class="bg-white p-3 rounded shadow-sm border">
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted fw-bold">DNI:</div>
+                        <div class="col-sm-8">@(string.IsNullOrEmpty(Model.Dni) ? "No registrado" : Model.Dni)</div>
+                    </div>
+                    <hr class="my-2" />
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted fw-bold">Rol en Sistema:</div>
+                        <div class="col-sm-8">
+                            <span class="badge @(Model.Rol == "Administrador" ? "bg-danger" : Model.Rol == "Profesor" ? "bg-success" : "bg-primary")">
+                                @Model.Rol
+                            </span>
+                        </div>
+                    </div>
+                    <hr class="my-2" />
+                    <div class="row mb-2">
+                        <div class="col-sm-4 text-muted fw-bold">Miembro desde:</div>
+                        <div class="col-sm-8">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-white text-center py-3">
+                <a asp-action="Index" class="btn btn-secondary fw-bold me-2">
+                    <i class="bi bi-arrow-left"></i> Volver a la Lista
+                </a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary fw-bold">
+                    <i class="bi bi-pencil"></i> Editar Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
