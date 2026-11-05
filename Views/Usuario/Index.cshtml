@@ -147,7 +147,7 @@
 </div>
 
 @section Scripts {
-    <!-- Librerias de Select2 CSS y JS -->
+    <!-- Librerías de Select2 CSS y JS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -175,10 +175,12 @@
                 }
             });
 
-            // Al seleccionar un usuario del desplegable, filtra la tabla de inmediato
+            // En lugar de enviar el texto completo con rol, enviamos solo la primera palabra (el nombre)
             $('#buscadorUsuariosAjax').on('select2:select', function (e) {
-                var textoSeleccionado = e.params.data.text.split(' (')[0]; 
-                window.location.href = '@Url.Action("Index", "Usuario")?buscar=' + encodeURIComponent(textoSeleccionado);
+                var datos = e.params.data;
+                // Extraemos únicamente el primer nombre o mandamos el ID para ver el detalle directo
+                var nombreBusqueda = datos.text.split(' ')[0]; 
+                window.location.href = '@Url.Action("Index", "Usuario")?buscar=' + encodeURIComponent(nombreBusqueda);
             });
         });
     </script>
