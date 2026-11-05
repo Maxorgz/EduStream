@@ -25,7 +25,7 @@ namespace EduStream.Controllers
             return RedirectToAction("Index", "Curso");
         }
 
-        public async Task<IActionResult> Crear(int leccionId)
+        public async Task<IActionResult> Create(int leccionId)
         {
             var leccion = await _leccionRepo.ObtenerPorIdAsync(leccionId);
             if (leccion == null) return NotFound();
@@ -43,7 +43,7 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Crear(MaterialEstudio modelo)
+        public async Task<IActionResult> Create(MaterialEstudio modelo)
         {
             if (ModelState.IsValid)
             {
@@ -114,7 +114,7 @@ namespace EduStream.Controllers
             return RedirectToAction("Details", "Curso", new { id = leccion.CursoId });
         }
         
-        [Authorize(Roles="Estudiante,Profesor...")] // Permitimos a los alumnos descargar
+        [Authorize(Roles="Estudiante,Profesor,Administrador")] // Permitimos a los alumnos descargar
         public async Task<IActionResult> Descargar(int id)
         {
             var material = await _materialRepo.ObtenerPorIdAsync(id);
