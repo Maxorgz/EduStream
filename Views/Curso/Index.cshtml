@@ -93,3 +93,20 @@
         </div>
     </div>
 </div>
+
+<!-- Paginación -->
+@if (ViewBag.TotalPaginas > 1)
+{
+    <nav aria-label="Navegación de páginas" class="mt-4 pb-4">
+        <ul class="pagination justify-content-center">
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="page-item @(i == ViewBag.PaginaActual ? "active" : "")">
+                    <a class="page-link" asp-action="Index" 
+                       asp-route-pagina="@i" 
+                       asp-route-buscar="@ViewBag.BusquedaActual">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
