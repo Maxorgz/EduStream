@@ -109,12 +109,21 @@
                 <!-- Inscripcion -->
                 @if (User.IsInRole("Estudiante"))
                 {
-                    <form asp-controller="Inscripcion" asp-action="Inscribir" method="post">
-                        <input type="hidden" name="CursoId" value="@Model.Id" />
-                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm class-hover-zoom">
-                            <i class="bi bi-cart-plus"></i> Inscribirme Ahora
-                        </button>
-                    </form>
+                    @if (ViewBag.YaInscripto == true)
+                    {
+                        <a asp-controller="ProgresoLeccion" asp-action="VerProgreso" asp-route-inscripcionId="@ViewBag.InscripcionId" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
+                            <i class="bi bi-play-circle"></i> Ir al Aula Virtual
+                        </a>
+                    }
+                    else
+                    {
+                        <form asp-controller="Inscripcion" asp-action="Inscribir" method="post">
+                            <input type="hidden" name="CursoId" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold shadow-sm class-hover-zoom">
+                                <i class="bi bi-cart-plus"></i> Inscribirme Ahora
+                            </button>
+                        </form>
+                    }
                 }
                 else if (!User.Identity!.IsAuthenticated)
                 {
@@ -122,7 +131,7 @@
                         Inicia Sesión para Inscribirte
                     </a>
                 }
-                else if (User.IsInRole("Profesor"))
+                else if (User.IsInRole("Profesor") || User.IsInRole("Administrador"))
                 {
                     <div class="alert alert-info mb-0">
                         <i class="bi bi-info-circle"></i> Eres el administrador de este curso.
