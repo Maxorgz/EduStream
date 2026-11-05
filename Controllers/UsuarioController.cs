@@ -268,6 +268,26 @@ namespace EduStream.Controllers
 
             return View(usuarioActualizado);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> BuscarUsuariosAjax(string termino)
+        {
+            var todos = await _usuarioRepo.ObtenerTodosAsync();
+            
+            var filtrados = todos.Where(u => 
+                (u.Nombre != null && u.Nombre.Contains(termino, StringComparison.OrdinalIgnoreCase)) || 
+                (u.Apellido != null && u.Apellido.Contains(termino, StringComparison.OrdinalIgnoreCase)) ||
+                (u.Email != null && u.Email.Contains(termino, StringComparison.OrdinalIgnoreCase))
+            ).ToList();
+
+            var resultados = filtrados.Select(u => new
+            {
+                id = u.Id,
+                text = u.Nombre + " " + u.Apellido + " (" + u.Rol + ")"
+            });
+
+            return Json(resultados);
+        }
 
     }
 }

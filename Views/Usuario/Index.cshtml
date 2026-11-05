@@ -12,13 +12,15 @@
 
 <div class="card shadow-sm border-0">
     <div class="card-header bg-white py-3">
-        <!-- Buscador -->
-        <form asp-action="Index" method="get" class="row g-2 align-items-center">
+        <!-- Buscador AJAX con Select2 -->
+        <div class="row g-2 align-items-center">
             <div class="col-auto flex-grow-1">
-                <input type="text" name="buscar" value="@busquedaActual" class="form-control" placeholder="Buscar por nombre, apellido o email..." />
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Buscar</button>
+                <select id="buscadorUsuariosAjax" class="form-control" style="width: 100%;">
+                    @if (!string.IsNullOrEmpty(busquedaActual))
+                    {
+                        <option value="@busquedaActual" selected>@busquedaActual</option>
+                    }
+                </select>
             </div>
             @if (!string.IsNullOrEmpty(busquedaActual))
             {
@@ -26,7 +28,7 @@
                     <a asp-action="Index" class="btn btn-secondary">Limpiar</a>
                 </div>
             }
-        </form>
+        </div>
     </div>
 
     <div class="card-body p-0">
@@ -51,7 +53,7 @@
                             <tr>
                                 <td class="ps-3 fw-bold text-muted">#@item.Id</td>
                                 <td class="fw-bold">@item.Nombre @item.Apellido</td>
-                                <td>@item.Email</td>
+                                <td class="text-break">@item.Email</td>
                                 <td>
                                     <span
                                         class="badge @(item.Rol == "Administrador" ? "bg-danger" : item.Rol == "Profesor" ? "bg-success" : "bg-primary")">
@@ -143,3 +145,41 @@
         </div>
     }
 </div>
+
+@section Scripts {
+    <!-- Librerias de Select2 CSS y JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#buscadorUsuariosAjax').select2({
+                placeholder: "Escriba al menos 2 letras para buscar un usuario...",
+                minimumInputLength: 2,
+                language: {
+                    inputTooShort: function () { return "Por favor ingrese 2 o más letras"; },
+                    noResults: function () { return "No se encontraron usuarios"; },
+                    searching: function () { return "Buscando en la base de datos..."; }
+                },
+                ajax: {
+                    url: '@Url.Action("BuscarUsuariosAjax", "Usuario")',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { termino: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    },
+                    cache: true
+                }
+            });
+
+            // Al seleccionar un usuario del desplegable, filtra la tabla de inmediato
+            $('#buscadorUsuariosAjax').on('select2:select', function (e) {
+                var textoSeleccionado = e.params.data.text.split(' (')[0]; 
+                window.location.href = '@Url.Action("Index", "Usuario")?buscar=' + encodeURIComponent(textoSeleccionado);
+            });
+        });
+    </script>
+}
