@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EduStream.Controllers
 {
-    [Authorize(Roles = "Administrador,Profesor")] 
+    [Authorize] 
     public class MaterialEstudioController : Controller
     {
         private readonly IMaterialEstudioRepositorio _materialRepo;
@@ -25,6 +25,7 @@ namespace EduStream.Controllers
             return RedirectToAction("Index", "Curso");
         }
 
+        [Authorize(Roles = "Administrador,Profesor")]
         public async Task<IActionResult> Create(int leccionId)
         {
             var leccion = await _leccionRepo.ObtenerPorIdAsync(leccionId);
@@ -43,6 +44,7 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Profesor")]
         public async Task<IActionResult> Create(MaterialEstudio modelo)
         {
             if (ModelState.IsValid)
@@ -91,6 +93,7 @@ namespace EduStream.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Profesor")]
         public async Task<IActionResult> Eliminar(int id)
         {
             var material = await _materialRepo.ObtenerPorIdAsync(id);

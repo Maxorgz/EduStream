@@ -33,7 +33,8 @@
                                 <td>@(item.Curso?.Titulo)</td>
                                 <td>$@item.MontoPago.ToString("N2")</td>
                                 <td>
-                                    <span class="badge @(item.EstadoPago == "Aprobado" ? "bg-success" : (item.EstadoPago == "Pendiente" ? "bg-warning text-dark" : "bg-danger"))">
+                                    <span
+                                        class="badge @(item.EstadoPago == "Aprobado" ? "bg-success" : (item.EstadoPago == "Pendiente" ? "bg-warning text-dark" : "bg-danger"))">
                                         @item.EstadoPago
                                     </span>
                                 </td>
@@ -43,23 +44,38 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Detalles">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white"
+                                       title="Ver Detalles">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
-                                    @if (item.Estado != "Anulada")
+                                    @if (item.Estado == "Anulada")
                                     {
-                                        <!-- Formulario para cambiar estado de pago a Aprobado -->
-                                        <form asp-action="CambiarEstadoPago" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="@item.Id" />
-                                            <input type="hidden" name="nuevoEstadoPago" value="Aprobado" />
-                                            <button type="submit" class="btn btn-sm btn-success" title="Aprobar Pago">
-                                                <i class="bi bi-check-circle"></i>
+                                        <!-- Botón para Reactivar una inscripción anulada -->
+                                        <form asp-action="Reactivar" asp-route-id="@item.Id" method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Seguro que quieres reactivar esta inscripción?');">
+                                            <button type="submit" class="btn btn-sm btn-warning" title="Reactivar Inscripción">
+                                                <i class="bi bi-arrow-counterclockwise"></i>
                                             </button>
                                         </form>
+                                    }
+                                    else
+                                    {
+                                        <!-- Mostrar Aprobar Pago solo si NO está aprobado -->
+                                        @if (item.EstadoPago != "Aprobado")
+                                        {
+                                            <form asp-action="CambiarEstadoPago" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="nuevoEstadoPago" value="Aprobado" />
+                                                <button type="submit" class="btn btn-sm btn-success" title="Aprobar Pago">
+                                                    <i class="bi bi-currency-dollar"></i>
+                                                </button>
+                                            </form>
+                                        }
 
-                                        <!-- Formulario para anular inscripción -->
-                                        <form asp-action="Anular" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres anular esta inscripción?');">
+                                        <!-- Botón para anular inscripción -->
+                                        <form asp-action="Anular" asp-route-id="@item.Id" method="post" class="d-inline"
+                                              onsubmit="return confirm('¿Seguro que quieres anular esta inscripción? El alumno perderá el acceso.');">
                                             <button type="submit" class="btn btn-sm btn-danger" title="Anular">
                                                 <i class="bi bi-x-circle"></i>
                                             </button>

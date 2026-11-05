@@ -30,8 +30,13 @@ namespace EduStream.Repositories
         public async Task<IEnumerable<Inscripcion>> ObtenerPorEstudianteIdAsync(int estudianteId)
         {
             return await _context.Inscripciones
-                .Include(i => i.Curso)
+                .Include(i => i.Curso) 
+                    .ThenInclude(c => c.Lecciones.OrderBy(l => l.Orden)) 
+                        .ThenInclude(l => l.Materiales)
+                .Include(i => i.Estudiante)
                 .Where(i => i.EstudianteId == estudianteId)
+                .AsSplitQuery()
+                .OrderByDescending(i => i.FechaInscripcion)
                 .ToListAsync();
         }
 
@@ -50,7 +55,7 @@ namespace EduStream.Repositories
             return inscripcion;
         }
 
-public async Task<IEnumerable<Inscripcion>> ObtenerPaginadoAsync(int pagina, int cantidadPorPagina)
+        public async Task<IEnumerable<Inscripcion>> ObtenerPaginadoAsync(int pagina, int cantidadPorPagina)
         {
             return await _context.Inscripciones
                 .Include(i => i.Estudiante)

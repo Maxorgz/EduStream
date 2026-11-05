@@ -24,7 +24,7 @@ namespace EduStream.Controllers
             int cantidadPorPagina = 10;
             var inscripciones = await _inscripcionRepo.ObtenerPaginadoAsync(pagina, cantidadPorPagina);
             var totalRegistros = await _inscripcionRepo.ContarTotalAsync();
-            
+
             ViewBag.PaginaActual = pagina;
             ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / cantidadPorPagina);
 
@@ -93,7 +93,7 @@ namespace EduStream.Controllers
 
             inscripcion.EstadoPago = nuevoEstadoPago;
             await _inscripcionRepo.ActualizarAsync(inscripcion);
-
+            TempData["Exito"] = "Estado de pago actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -108,7 +108,24 @@ namespace EduStream.Controllers
             inscripcion.Estado = "Anulada";
             await _inscripcionRepo.ActualizarAsync(inscripcion);
 
+            TempData["Exito"] = "Inscripción anulada correctamente.";
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
+        public async Task<IActionResult> Reactivar(int id)
+        {
+            var inscripcion = await _inscripcionRepo.ObtenerPorIdAsync(id);
+            if (inscripcion == null) return NotFound();
+
+            inscripcion.Estado = "Activa";
+            await _inscripcionRepo.ActualizarAsync(inscripcion);
+
+            TempData["Exito"] = "Inscripción reactivada correctamente.";
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }
