@@ -80,6 +80,6 @@ El sistema detectará la base de datos y creará automáticamente los usuarios d
 | **2. Login, Roles y Avatar** | ✅ Cumplido | [UsuarioController.cs](./Controllers/UsuarioController.cs) | ![Perfil con avatar](./Diagrama/usuario.png) |
 | **3. Manejo de Archivos (Extra)** | ✅ Cumplido | [MaterialEstudioController.cs](./Controllers/MaterialEstudioController.cs) | ![Material subido](./Diagrama/ManejodeArchivos.gif) |
 | **4. ABM en Vue.js + AJAX** | ✅ Cumplido | [CursosApiController.cs](./Controllers/CursosApiController.cs) | ![ABM Dinámico](./Diagrama/ABMDinamico.gif) |
-| **5. Paginado por Servidor** | ✅ Cumplido | [RepositorioCurso.cs](./repositories/RepositorioCurso.cs) | ![Paginado en Red](./docs/paginado.png) |
+| **5. Paginado por Servidor** | ✅ Cumplido | [RepositorioCurso.cs](./repositories/RepositorioCurso.cs) | ![Paginado en Red](./Diagrama/PaginadoporServidor.png) |
 | **6. Selección Asíncrona (AJAX)** | ✅ Cumplido | [InscripcionController.cs](./Controllers/InscripcionController.cs) | ![Desplegable Asíncrono](./docs/busqueda_ajax.gif) |
 | **7. Web API + JWT** | ✅ Cumplido | [AuthApiController.cs](./Controllers/AuthApiController.cs) | Con token: ![Postman JWT](./docs/postman_jwt.png) |
