@@ -33,7 +33,8 @@
                                 <td class="ps-3">
                                     @if (!string.IsNullOrEmpty(item.PortadaUrl))
                                     {
-                                        <img src="@item.PortadaUrl" alt="Portada" class="img-thumbnail" style="width: 60px; height: 45px; object-fit: cover;" />
+                                        <img src="@item.PortadaUrl" alt="Portada" class="img-thumbnail"
+                                             style="width: 60px; height: 45px; object-fit: cover;" />
                                     }
                                     else
                                     {
@@ -49,16 +50,31 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white" title="Ver Clases">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info text-white"
+                                       title="Ver Clases">
                                         <i class="bi bi-eye"></i> Clases
                                     </a>
                                     <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-primary" title="Editar">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('¿Seguro que quieres eliminar este curso?');">
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                    <!-- Botón para Cambiar Estado (Activar / Dar de baja) -->
+                                    <form asp-action="CambiarEstado" asp-route-id="@item.Id" method="post" class="d-inline">
+                                        @if (item.Estado == "Inactivo")
+                                        {
+                                            <!-- Botón Verde (Restaurar) -->
+                                            <button type="submit" class="btn btn-sm btn-success" title="Restaurar Curso"
+                                                    onclick="return confirm('¿Estás seguro de que deseas volver a publicar este curso?');">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Activar
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <!-- Botón Rojo para Eliminar/Baja -->
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Dar de baja"
+                                                    onclick="return confirm('¿¿Seguro que quieres dar de baja este curso? Ningún estudiante podrá verlo ni acceder a sus clases.');">
+                                                <i class="bi bi-trash"></i> Suspender
+                                            </button>
+                                        }
                                     </form>
                                 </td>
                             </tr>

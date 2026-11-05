@@ -12,7 +12,7 @@ namespace EduStream.Controllers
     public class CursoController : Controller
     {
         private readonly ICursoRepositorio _cursoRepo;
-        private readonly IUsuarioRepositorio _usuarioRepo; 
+        private readonly IUsuarioRepositorio _usuarioRepo;
         private readonly ICategoriaRepositorio _categoriaRepo;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
@@ -44,6 +44,17 @@ namespace EduStream.Controllers
         {
             var curso = await _cursoRepo.ObtenerCursoConDetallesAsync(id);
             if (curso == null) return NotFound();
+
+            // Si esta inactivo, bloqueamos a los estudiantes
+            if (curso.Estado == "Inactivo")
+            {
+                if (!User.IsInRole("Administrador") && !User.IsInRole("Profesor"))
+                {
+                    TempData["Error"] = "Este curso ya no está disponible.";
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
             return View(curso);
         }
         [AllowAnonymous]
@@ -162,14 +173,6 @@ namespace EduStream.Controllers
             ViewBag.Categorias = new SelectList(categorias, "Id", "Nombre");
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrador")] // Solo el admin borra cursos
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _cursoRepo.EliminarAsync(id);
-            return RedirectToAction(nameof(Index));
-        }
 
         // busqueda AJAX
         [HttpGet]
@@ -185,5 +188,21 @@ namespace EduStream.Controllers
 
             return Json(resultados);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador,Profesor")]
+        public async Task<IActionResult> CambiarEstado(int id)
+        {
+            var exito = await _cursoRepo.CambiarEstadoAsync(id);
+
+            if (exito)
+                TempData["Exito"] = "El estado del curso se actualizó correctamente.";
+            else
+                TempData["Error"] = "No se pudo actualizar el estado del curso.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

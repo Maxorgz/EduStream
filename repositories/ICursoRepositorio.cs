@@ -12,8 +12,8 @@ namespace EduStream.Repositories
         Task<IEnumerable<Curso>> ObtenerPorCategoriaIdAsync(int categoriaId);
         Task<IEnumerable<Curso>> ObtenerPorProfesorIdAsync(int profesorId);
         Task<Curso> CrearAsync(Curso curso);
+        Task<bool> CambiarEstadoAsync(int id);
         Task<bool> ActualizarAsync(Curso curso);
-        Task<bool> EliminarAsync(int id);
         Task<IEnumerable<Curso>> BuscarAsync(string searchTerm);
     }
 }

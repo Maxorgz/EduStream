@@ -43,19 +43,22 @@ namespace EduStream.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> EliminarAsync(int id)
-        {
-            var categoria = await _context.Categorias.FindAsync(id);
-            if (categoria == null) return false;
-
-            _context.Categorias.Remove(categoria);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
         public async Task<bool> ExisteNombreAsync(string nombre)
         {
             return await _context.Categorias
                 .AnyAsync(c => c.Nombre.ToLower() == nombre.ToLower());
         }
+
+        public async Task<bool> CambiarEstadoAsync(int id)
+        {
+            var categoria = await _context.Categorias.FindAsync(id);
+            if (categoria == null) return false;
+
+            categoria.Estado = !categoria.Estado;
+
+            _context.Categorias.Update(categoria);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }

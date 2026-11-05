@@ -33,8 +33,8 @@ namespace EduStream.Controllers
         {
             if (!ModelState.IsValid) return BadRequest("Datos invalidos");
 
-            categoria.Estado = true; 
-            
+            categoria.Estado = true;
+
             await _categoriaRepo.CrearAsync(categoria);
             return Json(new { success = true, message = "Categoria creada con exito", data = categoria });
         }
@@ -51,10 +51,10 @@ namespace EduStream.Controllers
 
         // delete
         [HttpPost]
-        public async Task<IActionResult> Eliminar(int id)
+        public async Task<IActionResult> CambiarEstado(int id)
         {
-            await _categoriaRepo.EliminarAsync(id);
-            return Json(new { success = true, message = "Categoria eliminada" });
+            var exito = await _categoriaRepo.CambiarEstadoAsync(id);
+            return Json(new { success = exito, message = "Estado actualizado" });
         }
     }
 }

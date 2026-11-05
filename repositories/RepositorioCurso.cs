@@ -64,6 +64,7 @@ namespace EduStream.Repositories
                 .Include(c => c.Profesor)
                 .Include(c => c.Lecciones.OrderBy(l => l.Orden))
                     .ThenInclude(l => l.Materiales)
+                    .AsSplitQuery() 
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
@@ -98,15 +99,6 @@ namespace EduStream.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> EliminarAsync(int id)
-        {
-            var curso = await _context.Cursos.FindAsync(id);
-            if (curso == null) return false;
-
-            _context.Cursos.Remove(curso);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
         public async Task<IEnumerable<Curso>> BuscarAsync(string searchTerm)
         {
             return await _context.Cursos
@@ -115,5 +107,18 @@ namespace EduStream.Repositories
                 .Where(c => c.Titulo.Contains(searchTerm) || c.Descripcion.Contains(searchTerm))
                 .ToListAsync();
         }
+
+        public async Task<bool> CambiarEstadoAsync(int id)
+        {
+            var curso = await _context.Cursos.FindAsync(id);
+            if (curso == null) return false;
+
+            // Si esta Inactivo lo pasa a Activo, y viceversa
+            curso.Estado = curso.Estado == "Inactivo" ? "Activo" : "Inactivo";
+
+            _context.Cursos.Update(curso);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
     }
 }
