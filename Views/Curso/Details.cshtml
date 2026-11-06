@@ -32,21 +32,25 @@
         <div class="card shadow-sm mb-4 border-0">
             @if (!string.IsNullOrEmpty(Model.PortadaUrl))
             {
-                <img src="@Model.PortadaUrl" class="card-img-top" style="max-height: 350px; object-fit: cover;" alt="Portada del curso">
+                <img src="@Model.PortadaUrl" class="card-img-top" style="max-height: 350px; object-fit: cover;"
+                     alt="Portada del curso">
             }
             <div class="card-body p-4">
                 <h4 class="card-title fw-bold border-bottom pb-2">Acerca de este curso</h4>
-                <p class="card-text fs-5" style="white-space: pre-line;">@Model.Descripcion</p>
+                <div class="card-text fs-5">
+                    @Html.Raw(Model.Descripcion)
+                </div>
             </div>
         </div>
 
         <!-- Plan de Estudios -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="fw-bold"><i class="bi bi-list-ol text-primary"></i> Temario del Curso</h4>
-            
+
             @if (User.IsInRole("Profesor"))
             {
-                <a asp-controller="Leccion" asp-action="Create" asp-route-cursoId="@Model.Id" class="btn btn-primary btn-sm shadow-sm">
+                <a asp-controller="Leccion" asp-action="Create" asp-route-cursoId="@Model.Id"
+                   class="btn btn-primary btn-sm shadow-sm">
                     <i class="bi bi-plus-circle"></i> Agregar Lección
                 </a>
             }
@@ -59,23 +63,34 @@
                 {
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="heading-@leccion.Id">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@leccion.Id">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapse-@leccion.Id">
                                 <span class="badge bg-primary me-3">Clase @leccion.Orden</span>
                                 <span class="fw-bold">@leccion.Titulo</span>
                             </button>
                         </h2>
                         <div id="collapse-@leccion.Id" class="accordion-collapse collapse" data-bs-parent="#accordionLecciones">
                             <div class="accordion-body bg-light">
-                                <p class="text-muted mb-0">@(string.IsNullOrEmpty(leccion.Contenido) ? "Detalles de la clase." : leccion.Contenido)</p>
-                                
+                                @if (string.IsNullOrEmpty(leccion.Contenido))
+                                {
+                                    <p class="text-muted mb-0">Detalles de la clase.</p>
+                                }
+                                else
+                                {
+                                    <div class="text-muted mb-0">
+                                        @Html.Raw(leccion.Contenido)
+                                    </div>
+                                }
                                 <!--edicion Profesor -->
                                 @if (User.IsInRole("Profesor"))
                                 {
                                     <div class="d-flex justify-content-end gap-2 mt-3 pt-3 border-top">
-                                        <a asp-controller="Leccion" asp-action="Details" asp-route-id="@leccion.Id" class="btn btn-sm btn-info text-white">
+                                        <a asp-controller="Leccion" asp-action="Details" asp-route-id="@leccion.Id"
+                                           class="btn btn-sm btn-info text-white">
                                             <i class="bi bi-paperclip"></i> Materiales
                                         </a>
-                                        <a asp-controller="Leccion" asp-action="Edit" asp-route-id="@leccion.Id" class="btn btn-sm btn-warning">
+                                        <a asp-controller="Leccion" asp-action="Edit" asp-route-id="@leccion.Id"
+                                           class="btn btn-sm btn-warning">
                                             <i class="bi bi-pencil"></i> Editar
                                         </a>
                                     </div>

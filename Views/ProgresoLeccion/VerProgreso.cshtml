@@ -4,7 +4,7 @@
     int inscripcionId = ViewBag.InscripcionId;
     int totalLecciones = Model?.Count() ?? 0;
     int completadas = ViewBag.TotalCompletadas ?? 0;
-    
+
     // Porcentaje de progreso
     int porcentaje = totalLecciones > 0 ? (int)Math.Round((double)completadas / totalLecciones * 100) : 0;
 }
@@ -22,63 +22,75 @@
         <div class="card-body">
             <div class="d-flex justify-content-between mb-1">
                 <span class="fw-bold">Tu progreso en el curso</span>
-                <span class="fw-bold text-primary" id="textoPorcentaje">@porcentaje% (@completadas de @totalLecciones)</span>
-            </div>
-            <div class="progress" style="height: 20px;">
-                <div id="barraPorcentaje" class="progress-bar progress-bar-striped progress-bar-animated bg-success" 
-                     role="progressbar" style="width: @porcentaje%;" 
-                     aria-valuenow="@porcentaje" aria-valuemin="0" aria-valuemax="100"></div>
+                <span class="fw-bold text-primary" id="textoPorcentaje">@porcentaje% (@completadas de
+                    @totalLecciones)</span>
+                </div>
+                <div class="progress" style="height: 20px;">
+                    <div id="barraPorcentaje" class="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                         role="progressbar" style="width: @porcentaje%;" aria-valuenow="@porcentaje" aria-valuemin="0"
+                         aria-valuemax="100"></div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Lista de Clases -->
-    @if (Model != null && Model.Any())
-    {
-        <div class="accordion shadow-sm" id="accordionClases">
-            @foreach (var progreso in Model.OrderBy(p => p.Leccion?.Orden))
-            {
-                var leccion = progreso.Leccion;
-                if (leccion == null) continue;
+        <!-- Lista de Clases -->
+        @if (Model != null && Model.Any())
+        {
+            <div class="accordion shadow-sm" id="accordionClases">
+                @foreach (var progreso in Model.OrderBy(p => p.Leccion?.Orden))
+                {
+                    var leccion = progreso.Leccion;
+                    if (leccion == null) continue;
 
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="heading-@leccion.Id">
-                        <button class="accordion-button @(progreso.Completada ? "bg-light" : "") collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-@leccion.Id">
-                            
-                            <!-- Icono segun estado -->
-                            <i id="icono-@leccion.Id" class="bi @(progreso.Completada ? "bi-check-circle-fill text-success" : "bi-circle text-muted") fs-5 me-3"></i>
-                            
-                            <span class="fw-bold">Clase @leccion.Orden: @leccion.Titulo</span>
-                        </button>
-                    </h2>
-                    <div id="collapse-@leccion.Id" class="accordion-collapse collapse" data-bs-parent="#accordionClases">
-                        <div class="accordion-body">
-                            
-                            <!-- Contenido Teórico -->
-                            <div class="mb-4 text-break" style="white-space: pre-line;">
-                                @(string.IsNullOrEmpty(leccion.Contenido) ? "Sin contenido teórico." : leccion.Contenido)
-                            </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading-@leccion.Id">
+                            <button class="accordion-button @(progreso.Completada ? "bg-light" : "") collapsed" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#collapse-@leccion.Id">
 
-                            <!-- Materiales Adjuntos -->
-                            @if (leccion.Materiales != null && leccion.Materiales.Any())
-                            {
-                                <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-paperclip"></i> Recursos Descargables</h6>
-                                <ul class="list-group mb-4">
-                                    @foreach (var mat in leccion.Materiales)
+                                <!-- Icono segun estado -->
+                                <i id="icono-@leccion.Id"
+                                   class="bi @(progreso.Completada ? "bi-check-circle-fill text-success" : "bi-circle text-muted") fs-5 me-3"></i>
+
+                                <span class="fw-bold">Clase @leccion.Orden: @leccion.Titulo</span>
+                            </button>
+                        </h2>
+                        <div id="collapse-@leccion.Id" class="accordion-collapse collapse" data-bs-parent="#accordionClases">
+                            <div class="accordion-body">
+
+                                <!-- Contenido Teórico -->
+                                <div class="mb-4 text-break">
+                                    @if (string.IsNullOrEmpty(leccion.Contenido))
                                     {
-                                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <i class="bi bi-file-earmark-text text-danger me-2"></i>
-                                                <span class="fw-bold">@mat.Titulo</span>
-                                                <span class="badge bg-secondary ms-2">@mat.TipoArchivo</span>
-                                            </div>
-                                            <a asp-controller="MaterialEstudio" asp-action="Descargar" asp-route-id="@mat.Id" class="btn btn-sm btn-info text-white">
-                                                <i class="bi bi-download"></i> Descargar
-                                            </a>
-                                        </li>
+                                        <span>Sin contenido teórico.</span>
                                     }
-                                </ul>
-                            }
+                                    else
+                                    {
+                                        @Html.Raw(leccion.Contenido)
+                                    }
+                                </div>
+
+                                <!-- Materiales Adjuntos -->
+                                @if (leccion.Materiales != null && leccion.Materiales.Any())
+                                {
+                                    <h6 class="fw-bold border-bottom pb-2 mb-3"><i class="bi bi-paperclip"></i> Recursos Descargables
+                                    </h6>
+                                    <ul class="list-group mb-4">
+                                        @foreach (var mat in leccion.Materiales)
+                                        {
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <i class="bi bi-file-earmark-text text-danger me-2"></i>
+                                                    <span class="fw-bold">@mat.Titulo</span>
+                                                    <span class="badge bg-secondary ms-2">@mat.TipoArchivo</span>
+                                                </div>
+                                                <a asp-controller="MaterialEstudio" asp-action="Descargar" asp-route-id="@mat.Id"
+                                                   class="btn btn-sm btn-info text-white">
+                                                    <i class="bi bi-download"></i> Descargar
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
 
                             <!-- Completado (AJAX) -->
                             <div class="text-end border-top pt-3">

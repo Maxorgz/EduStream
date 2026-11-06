@@ -23,6 +23,7 @@ namespace EduStream.Repositories
             return await _context.Inscripciones
                 .Include(i => i.Estudiante)
                 .Include(i => i.Curso)
+                    .ThenInclude(c => c.Categoria)
                 .Include(i => i.Progresos)
                 .FirstOrDefaultAsync(i => i.Id == id);
         }

@@ -1,0 +1,73 @@
+@model EduStream.Models.Leccion
+@{
+    ViewData["Title"] = "Editar Lección";
+}
+
+<div class="row mt-4 mb-5">
+    <div class="col-md-8 offset-md-2">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-dark">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-pencil-square"></i> Editar Lección</h4>
+            </div>
+            <div class="card-body p-4 bg-light">
+                <form asp-action="Edit" method="post">
+                    <!-- Resumen de errores -->
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="CursoId" />
+
+                    <div class="mb-3">
+                        <label asp-for="Titulo" class="form-label fw-bold">Título de la Lección</label>
+                        <input asp-for="Titulo" class="form-control" placeholder="Ej: Introducción al Desarrollo..." />
+                        <span asp-validation-for="Titulo" class="text-danger fw-bold"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="Orden" class="form-label fw-bold">Orden (Número de clase)</label>
+                            <input asp-for="Orden" type="number" class="form-control" />
+                            <span asp-validation-for="Orden" class="text-danger fw-bold"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Contenido" class="form-label fw-bold">Contenido Teórico</label>
+                        <textarea asp-for="Contenido" class="form-control" rows="6" placeholder="Desarrollo de la clase..."></textarea>
+                        <span asp-validation-for="Contenido" class="text-danger fw-bold"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <a asp-controller="Curso" asp-action="Details" asp-route-id="@Model.CursoId" class="btn btn-secondary shadow-sm">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-warning fw-bold shadow-sm">
+                            <i class="bi bi-save"></i> Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script src="https://cdn.tiny.cloud/1/jjimep12u35sln70qwamef04k66tauj4fesy398kqpwjlsts/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+    
+    <script>
+        tinymce.init({
+            selector: '#Contenido', 
+            plugins: 'lists link table code help wordcount',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | table link | help',
+            language: 'es',
+            height: 400,
+            setup: function (editor) {
+                editor.on('change', function () {
+                    tinymce.triggerSave();
+                });
+            }
+        });
+    </script>
+}

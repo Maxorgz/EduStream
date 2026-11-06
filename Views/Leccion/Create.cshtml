@@ -30,7 +30,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="Contenido" class="form-label fw-bold">Contenido o Descripcion</label>
+                        <label asp-for="Contenido" class="form-label fw-bold">Contenido De la Clase o Descripción</label>
                         <textarea asp-for="Contenido" class="form-control" rows="5" placeholder="Escribe aquí el desarrollo de la clase, instrucciones o texto de lectura..."></textarea>
                         <span asp-validation-for="Contenido" class="text-danger"></span>
                     </div>
@@ -52,4 +52,23 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <!-- TinyMCE-->
+    <script src="https://cdn.tiny.cloud/1/jjimep12u35sln70qwamef04k66tauj4fesy398kqpwjlsts/tinymce/8/tinymce.min.js" referrerpolicy="origin" crossorigin="anonymous"></script>
+    
+    <!-- editor -->
+    <script>
+        tinymce.init({
+            selector: '#Contenido',
+            plugins: 'lists link table code help wordcount',
+            toolbar: 'undo redo | blocks | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | table link | help',
+            language: 'es', 
+            height: 400,
+            setup: function (editor) {
+                editor.on('change', function () {
+                    tinymce.triggerSave();
+                });
+            }
+        });
+    </script>
 }

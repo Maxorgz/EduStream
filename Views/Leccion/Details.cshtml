@@ -9,7 +9,8 @@
         <h2 class="fw-bold mb-0">@Model.Titulo</h2>
     </div>
     <div class="col-md-4 text-end">
-        <a asp-controller="Curso" asp-action="Details" asp-route-id="@Model.CursoId" class="btn btn-secondary shadow-sm">
+        <a asp-controller="Curso" asp-action="Details" asp-route-id="@Model.CursoId"
+           class="btn btn-secondary shadow-sm">
             <i class="bi bi-arrow-left"></i> Volver al Curso
         </a>
     </div>
@@ -25,15 +26,18 @@
             <div class="card-body bg-light">
                 @if (!string.IsNullOrEmpty(Model.Contenido))
                 {
-                    <p class="card-text" style="white-space: pre-line;">@Model.Contenido</p>
+                    <div class="card-text">
+                        @Html.Raw(Model.Contenido)
+                    </div>
                 }
                 else
                 {
-                    <p class="text-muted fst-italic">No hay texto teorico para esta clase. Todo el contenido está en los materiales adjuntos.</p>
-                }
+                    <p class="text-muted fst-italic">No hay texto teorico para esta clase. Todo el contenido está en los
+                        materiales adjuntos.</p>
+                    }
+                </div>
             </div>
         </div>
-    </div>
 
     <!-- Materiales (PDFs, Videos, etc) -->
     <div class="col-md-5 mb-4">
