@@ -44,7 +44,7 @@ El sistema detectará la base de datos y creará automáticamente los usuarios d
 
 1. **Clonar el repositorio:**
    ```bash
-   git clone https://github.com/Danirodriguez45B/EduStream.git
+   git clone https://github.com/Maxorgz/EduStream.git
    ```
 
 2. **Configurar la cadena de conexión:**
