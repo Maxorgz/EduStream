@@ -1,12 +1,13 @@
 @model IEnumerable<EduStream.Models.Curso>
 @{
-    ViewData["Title"] = "Catálogo de Cursos";
+    ViewData["Title"] = "Catalogo de Cursos";
 }
 
 <div class="text-center my-5">
     <h1 class="display-5 fw-bold text-primary">Catalogo de Cursos</h1>
     <p class="lead text-muted">Aprende a tu propio ritmo con nuestros expertos.</p>
 </div>
+
 <!-- Buscador AJAX -->
 <div class="row justify-content-center mb-5">
     <div class="col-md-6">
@@ -28,42 +29,8 @@
     </div>
 </div>
 
-<div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-
-    <!-- Controles de Paginación -->
-    @{
-        int paginaActual = ViewBag.PaginaActual ?? 1;
-        int totalPaginas = ViewBag.TotalPaginas ?? 1;
-        string busquedaActual = ViewBag.BusquedaActual as string;
-    }
-
-    @if (totalPaginas > 1)
-    {
-        <div class="d-flex justify-content-center mt-4 mb-5">
-            <nav aria-label="Navegación del catálogo">
-                <ul class="pagination pagination-lg">
-                    <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
-                        <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual - 1)"
-                           asp-route-buscar="@busquedaActual">&laquo; Anterior</a>
-                    </li>
-
-                    @for (int i = 1; i <= totalPaginas; i++)
-                    {
-                        <li class="page-item @(i == paginaActual ? "active" : "")">
-                            <a class="page-link" asp-action="Catalogo" asp-route-pagina="@i"
-                               asp-route-buscar="@busquedaActual">@i</a>
-                        </li>
-                    }
-
-                    <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
-                        <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual + 1)"
-                           asp-route-buscar="@busquedaActual">Siguiente &raquo;</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-    }
-
+<!-- Cursos -->
+<div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
     @if (Model != null && Model.Any())
     {
         @foreach (var curso in Model)
@@ -121,6 +88,40 @@
     }
 </div>
 
+<!-- control pag -->
+@{
+    int paginaActual = ViewBag.PaginaActual ?? 1;
+    int totalPaginas = ViewBag.TotalPaginas ?? 1;
+    string busquedaActual = ViewBag.BusquedaActual as string;
+}
+
+@if (totalPaginas > 1)
+{
+    <div class="d-flex justify-content-center mt-2 mb-5">
+        <nav aria-label="Navegación del catálogo">
+            <ul class="pagination pagination-lg">
+                <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual - 1)"
+                       asp-route-buscar="@busquedaActual">&laquo; Anterior</a>
+                </li>
+
+                @for (int i = 1; i <= totalPaginas; i++)
+                {
+                    <li class="page-item @(i == paginaActual ? "active" : "")">
+                        <a class="page-link" asp-action="Catalogo" asp-route-pagina="@i"
+                           asp-route-buscar="@busquedaActual">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                    <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual + 1)"
+                       asp-route-buscar="@busquedaActual">Siguiente &raquo;</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+}
+
 <!-- Estilo momentaneo  -->
 <style>
     .class-hover-zoom {
@@ -138,7 +139,6 @@
 
     <script>
         $(document).ready(function () {
-            // Buscador de cursos con Select2 y AJAX
             $('#buscadorCursosAjax').select2({
                 placeholder: "¿Qué quieres aprender hoy? (Escribe al menos 2 letras)",
                 minimumInputLength: 2,
