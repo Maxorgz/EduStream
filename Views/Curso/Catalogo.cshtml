@@ -7,20 +7,63 @@
     <h1 class="display-5 fw-bold text-primary">Catalogo de Cursos</h1>
     <p class="lead text-muted">Aprende a tu propio ritmo con nuestros expertos.</p>
 </div>
-
-<!-- Buscador-->
+<!-- Buscador AJAX -->
 <div class="row justify-content-center mb-5">
     <div class="col-md-6">
-        <form asp-action="Catalogo" method="get" class="d-flex shadow-sm">
-            <input class="form-control form-control-lg border-primary border-end-0 rounded-start" type="search" name="buscar" placeholder="¿Qué quieres aprender hoy?" aria-label="Buscar">
-            <button class="btn btn-primary btn-lg rounded-end" type="submit">
-                <i class="bi bi-search"></i> Buscar
-            </button>
-        </form>
+        <select id="buscadorCursosAjax" class="form-control form-control-lg shadow-sm" style="width: 100%;">
+            @if (!string.IsNullOrEmpty(ViewBag.BusquedaActual as string))
+            {
+                <option value="@ViewBag.BusquedaActual" selected>@ViewBag.BusquedaActual</option>
+            }
+        </select>
+
+        @if (!string.IsNullOrEmpty(ViewBag.BusquedaActual as string))
+        {
+            <div class="text-center mt-3">
+                <a asp-action="Catalogo" class="btn btn-secondary shadow-sm">
+                    <i class="bi bi-x-circle"></i> Limpiar Filtro
+                </a>
+            </div>
+        }
     </div>
 </div>
 
 <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+
+    <!-- Controles de Paginación -->
+    @{
+        int paginaActual = ViewBag.PaginaActual ?? 1;
+        int totalPaginas = ViewBag.TotalPaginas ?? 1;
+        string busquedaActual = ViewBag.BusquedaActual as string;
+    }
+
+    @if (totalPaginas > 1)
+    {
+        <div class="d-flex justify-content-center mt-4 mb-5">
+            <nav aria-label="Navegación del catálogo">
+                <ul class="pagination pagination-lg">
+                    <li class="page-item @(paginaActual == 1 ? "disabled" : "")">
+                        <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual - 1)"
+                           asp-route-buscar="@busquedaActual">&laquo; Anterior</a>
+                    </li>
+
+                    @for (int i = 1; i <= totalPaginas; i++)
+                    {
+                        <li class="page-item @(i == paginaActual ? "active" : "")">
+                            <a class="page-link" asp-action="Catalogo" asp-route-pagina="@i"
+                               asp-route-buscar="@busquedaActual">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(paginaActual == totalPaginas ? "disabled" : "")">
+                        <a class="page-link" asp-action="Catalogo" asp-route-pagina="@(paginaActual + 1)"
+                           asp-route-buscar="@busquedaActual">Siguiente &raquo;</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+
     @if (Model != null && Model.Any())
     {
         @foreach (var curso in Model)
@@ -30,11 +73,13 @@
                     <!-- Portada -->
                     @if (!string.IsNullOrEmpty(curso.PortadaUrl))
                     {
-                        <img src="@curso.PortadaUrl" class="card-img-top" alt="@curso.Titulo" style="height: 200px; object-fit: cover;">
+                        <img src="@curso.PortadaUrl" class="card-img-top" alt="@curso.Titulo"
+                             style="height: 200px; object-fit: cover;">
                     }
                     else
                     {
-                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center card-img-top" style="height: 200px;">
+                        <div class="bg-secondary text-white d-flex align-items-center justify-content-center card-img-top"
+                             style="height: 200px;">
                             <i class="bi bi-image fs-1"></i>
                         </div>
                     }
@@ -45,12 +90,13 @@
                             <span class="badge bg-info text-dark">@(curso.Categoria?.Nombre ?? "General")</span>
                         </div>
                         <h5 class="card-title fw-bold">@curso.Titulo</h5>
-                        
+
                         <!-- Descripcion -->
                         <p class="card-text text-muted flex-grow-1" style="font-size: 0.9rem;">
-                            @(curso.Descripcion.Length > 100 ? curso.Descripcion.Substring(0, 100) + "..." : curso.Descripcion)
+                            @(curso.Descripcion.Length > 100 ? curso.Descripcion.Substring(0, 100) + "..." :
+                            curso.Descripcion)
                         </p>
-                        
+
                         <div class="mt-3">
                             <span class="fs-4 fw-bold text-success">$@curso.Precio.ToString("N2")</span>
                         </div>
@@ -85,3 +131,40 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
     }
 </style>
+
+@section Scripts {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Buscador de cursos con Select2 y AJAX
+            $('#buscadorCursosAjax').select2({
+                placeholder: "¿Qué quieres aprender hoy? (Escribe al menos 2 letras)",
+                minimumInputLength: 2,
+                language: {
+                    inputTooShort: function () { return "Por favor ingrese 2 o más letras"; },
+                    noResults: function () { return "No se encontraron cursos activos con ese nombre"; },
+                    searching: function () { return "Buscando en el catálogo..."; }
+                },
+                ajax: {
+                    url: '@Url.Action("BuscarCursosAjax", "Curso")', 
+                    dataType: 'json',
+                    delay: 250, 
+                    data: function (params) {
+                        return { termino: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    },
+                    cache: true
+                }
+            });
+
+            $('#buscadorCursosAjax').on('select2:select', function (e) {
+                var datos = e.params.data;
+                window.location.href = '@Url.Action("Catalogo", "Curso")?buscar=' + encodeURIComponent(datos.text);
+            });
+        });
+    </script>
+}

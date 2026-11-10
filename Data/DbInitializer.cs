@@ -6,7 +6,6 @@ namespace EduStream.Data
     {
         public static void Initialize(EduStreamDbContext context)
         {
-            // Verifica si ya existen usuarios para no duplicarlos cada vez que compilas
             if (context.Usuarios.Any())
             {
                 return; 

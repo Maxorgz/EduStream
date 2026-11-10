@@ -193,34 +193,26 @@ namespace EduStream.Controllers
         [Authorize]
         public async Task<IActionResult> ActualizarAvatar(Usuario modeloView)
         {
-            // Obtenemos el usuario real de la base de datos
             var usuarioBd = await _usuarioRepo.ObtenerPorIdAsync(modeloView.Id);
             if (usuarioBd == null) return NotFound();
 
             if (modeloView.AvatarFile != null && modeloView.AvatarFile.Length > 0)
             {
-                // 1. Definimos ruta en wwwroot/images/avatars
                 string carpetaDestino = Path.Combine(_webHostEnvironment.WebRootPath, "images", "avatars");
                 if (!Directory.Exists(carpetaDestino)) Directory.CreateDirectory(carpetaDestino);
-
-                // 2. Generamos un nombre único para evitar que fotos con el mismo nombre se pisen
                 string nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(modeloView.AvatarFile.FileName);
                 string rutaCompleta = Path.Combine(carpetaDestino, nombreArchivo);
-
-                // 3. Guardamos el archivo físico
                 using (var stream = new FileStream(rutaCompleta, FileMode.Create))
                 {
                     await modeloView.AvatarFile.CopyToAsync(stream);
                 }
 
-                // 4. Borramos el avatar anterior si existía
                 if (!string.IsNullOrEmpty(usuarioBd.AvatarUrl))
                 {
                     string rutaVieja = Path.Combine(_webHostEnvironment.WebRootPath, usuarioBd.AvatarUrl.TrimStart('/'));
                     if (System.IO.File.Exists(rutaVieja)) System.IO.File.Exists(rutaVieja);
                 }
 
-                // 5. Actualizamos la URL en la base de datos
                 usuarioBd.AvatarUrl = "/images/avatars/" + nombreArchivo;
                 await _usuarioRepo.ActualizarAsync(usuarioBd);
 

@@ -57,9 +57,12 @@ namespace EduStream.Controllers
 
             return View(curso);
         }
+
         [AllowAnonymous]
-        public async Task<IActionResult> Catalogo(string? buscar)
+        public async Task<IActionResult> Catalogo(string? buscar, int pagina = 1)
         {
+            int cantidadPorPagina = 6;
+
             var cursos = await _cursoRepo.ObtenerTodosAsync();
             var cursosActivos = cursos.Where(c => c.Estado == "Activo");
 
@@ -70,7 +73,17 @@ namespace EduStream.Controllers
                     c.Descripcion.Contains(buscar, StringComparison.OrdinalIgnoreCase));
             }
 
-            return View(cursosActivos);
+            int totalRegistros = cursosActivos.Count();
+            var cursosPaginados = cursosActivos
+                                    .Skip((pagina - 1) * cantidadPorPagina)
+                                    .Take(cantidadPorPagina)
+                                    .ToList();
+
+            ViewBag.BusquedaActual = buscar;
+            ViewBag.PaginaActual = pagina;
+            ViewBag.TotalPaginas = (int)Math.Ceiling((double)totalRegistros / cantidadPorPagina);
+
+            return View(cursosPaginados);
         }
 
         // SEGURIDAD Y ROLES
@@ -202,6 +215,29 @@ namespace EduStream.Controllers
                 TempData["Error"] = "No se pudo actualizar el estado del curso.";
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> BuscarCursosAjax(string termino)
+        {
+            if (string.IsNullOrWhiteSpace(termino) || termino.Length < 2)
+                return Json(new List<object>());
+
+            var todos = await _cursoRepo.ObtenerTodosAsync();
+
+            var filtrados = todos.Where(c =>
+                (c.Titulo != null && c.Titulo.Contains(termino, StringComparison.OrdinalIgnoreCase)) &&
+                c.Estado == "Activo"
+            ).ToList();
+
+            var resultados = filtrados.Select(c => new
+            {
+                id = c.Id,
+                text = c.Titulo
+            });
+
+            return Json(resultados);
         }
 
     }
