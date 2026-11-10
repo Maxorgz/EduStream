@@ -18,7 +18,6 @@ namespace EduStream.Data
         public DbSet<MaterialEstudio> MaterialesEstudio { get; set; }
         public DbSet<ProgresoLeccion> ProgresosLecciones { get; set; }
 
-        // Configuraciones adicionales usando Fluent API si fueran necesarias
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
