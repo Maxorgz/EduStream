@@ -82,4 +82,4 @@ El sistema detectará la base de datos y creará automáticamente los usuarios d
 | **4. ABM en Vue.js + AJAX** | ✅ Cumplido | [CursosApiController.cs](./Controllers/CursosApiController.cs) | ![ABM Dinámico](./Diagrama/ABMDinamico.gif) |
 | **5. Paginado por Servidor** | ✅ Cumplido | [RepositorioCurso.cs](./repositories/RepositorioCurso.cs) | ![Paginado en Red](./Diagrama/PaginadoporServidor.png) |
 | **6. Selección Asíncrona (AJAX)** | ✅ Cumplido | [InscripcionController.cs](./Controllers/InscripcionController.cs) | ![Desplegable Asíncrono](./Diagrama/SelecciónAsíncrona(AJAX).gif) |
-| **7. Web API + JWT** | ✅ Cumplido | [AuthApiController.cs](./Controllers/AuthApiController.cs) | Con token: ![Postman JWT](./docs/postman_jwt.png) |
+| **7. Web API + JWT** | ✅ Cumplido | [AuthApiController.cs](./Controllers/AuthApiController.cs) | Con token: ![Postman JWT](./Diagrama/postman%20login%202.jpg)| [Postman JWT](./Diagrama/postman%20get%20cursos.jpg) |

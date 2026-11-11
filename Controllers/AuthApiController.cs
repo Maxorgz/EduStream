@@ -1,4 +1,5 @@
 using EduStream.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,11 +13,13 @@ namespace EduStream.Controllers
     public class AuthApiController : ControllerBase
     {
         private readonly IUsuarioRepositorio _usuarioRepo;
+        private readonly ICursoRepositorio _cursoRepo;
         private readonly IConfiguration _config;
 
-        public AuthApiController(IUsuarioRepositorio usuarioRepo, IConfiguration config)
+        public AuthApiController(IUsuarioRepositorio usuarioRepo, ICursoRepositorio cursoRepo, IConfiguration config)
         {
             _usuarioRepo = usuarioRepo;
+            _cursoRepo = cursoRepo;
             _config = config;
         }
 
@@ -53,8 +56,18 @@ namespace EduStream.Controllers
 
             return Ok(new { token = tokenString, mensaje = "Autenticación exitosa" });
         }
-    }
 
+
+        [HttpGet("cursos")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
+        public async Task<IActionResult> GetCursos()
+        {
+            var cursos = await _cursoRepo.ObtenerTodosAsync();
+            var listado = cursos.Select(c => new { c.Id, c.Titulo, c.Precio }).ToList();
+
+            return Ok(listado);
+        }
+    }
     public class ApiLoginRequest
     {
         public string Email { get; set; } = string.Empty;
