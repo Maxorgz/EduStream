@@ -72,6 +72,16 @@ El sistema detectará la base de datos y creará automáticamente los usuarios d
 
 ---
 
+## 🔐 Pruebas de Web API REST con JWT
+
+Para validar el funcionamiento y la seguridad de la API independiente, se realizaron pruebas directas utilizando Postman (ver capturas en la matriz de evidencias). El flujo comprobado tiene dos pasos:
+
+1. Generación del Token (POST /api/authapi/login): Se envían las credenciales de un usuario válido en formato JSON. El servidor las verifica y devuelve un Token JWT firmado y encriptado.
+
+2. Consumo Protegido (GET /api/authapi/cursos): Se solicita la lista de cursos enviando el Token obtenido en la cabecera HTTP (Authorization: Bearer Token). La API valida la firma y vigencia del token antes de devolver los datos. Cualquier petición sin token, o con un token adulterado/vencido, es rechazada automáticamente con un error 401 Unauthorized.
+
+---
+
 ## 📋 Matriz de Evidencias de Requerimientos Mínimos
 
 | Requerimiento Mínimo | Estado | Enlace al Código / Controladores | Evidencia (Captura / GIF / Video) |
@@ -82,4 +92,4 @@ El sistema detectará la base de datos y creará automáticamente los usuarios d
 | **4. ABM en Vue.js + AJAX** | ✅ Cumplido | [CursosApiController.cs](./Controllers/CursosApiController.cs) | ![ABM Dinámico](./Diagrama/ABMDinamico.gif) |
 | **5. Paginado por Servidor** | ✅ Cumplido | [RepositorioCurso.cs](./repositories/RepositorioCurso.cs) | ![Paginado en Red](./Diagrama/PaginadoporServidor.png) |
 | **6. Selección Asíncrona (AJAX)** | ✅ Cumplido | [InscripcionController.cs](./Controllers/InscripcionController.cs) | ![Desplegable Asíncrono](./Diagrama/SelecciónAsíncrona(AJAX).gif) |
-| **7. Web API + JWT** | ✅ Cumplido | [AuthApiController.cs](./Controllers/AuthApiController.cs) | Con token: ![Postman JWT](./Diagrama/postman%20login%202.jpg)| [Postman JWT](./Diagrama/postman%20get%20cursos.jpg) |
+| **7. Web API + JWT** | ✅ Cumplido | [AuthApiController.cs](./Controllers/AuthApiController.cs) | <img src="./Diagrama/postman%20login%202.jpg" width="300" alt="Login"> <br> <img src="./Diagrama/postman%20get%20cursos.jpg" width="300" alt="Cursos"> |
